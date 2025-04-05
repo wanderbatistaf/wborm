@@ -1,0 +1,59 @@
+site_name: WBORM
+site_description: ORM leve com suporte a JDBC e Informix
+site_author: Wanderson Batista
+site_url: https://wanderbatistaf.github.io/wborm/
+
+repo_name: wanderbatistaf/wborm
+repo_url: https://github.com/wanderbatistaf/wborm
+edit_uri: edit/main/docs/
+
+theme:
+  name: material
+  language: pt-BR
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - navigation.indexes
+    - toc.integrate
+    - content.code.annotate
+    - search.suggest
+    - search.highlight
+  palette:
+    - scheme: default
+      primary: indigo
+      accent: indigo
+  icon:
+    repo: fontawesome/brands/github
+  favicon: images/wborm.png
+  logo: images/wborm.png
+
+extra_css:
+  - assets/stylesheets/extra.css
+
+nav:
+  - Início: index.md
+  - Modelos: modelos.md
+  - Exemplos: exemplos.md
+  - wbjdbc-wborm: integra-wbjdbc.md
+  - Sobre: por-que-usar.md
+
+markdown_extensions:
+  - toc:
+      permalink: true
+  - tables
+  - fenced_code
+  - footnotes
+  - attr_list
+  - def_list
+  - pymdownx.highlight
+  - pymdownx.superfences
+  - pymdownx.inlinehilite
+  - pymdownx.details
+  - pymdownx.snippets
+  - pymdownx.tabbed:
+      alternate_style: true
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/wanderbatistaf

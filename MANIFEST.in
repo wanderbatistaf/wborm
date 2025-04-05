@@ -1,0 +1,6 @@
+include README.md
+include LICENSE
+include pyproject.toml
+recursive-include wborm *.py
+recursive-include wborm/static *
+recursive-include wborm/templates *
