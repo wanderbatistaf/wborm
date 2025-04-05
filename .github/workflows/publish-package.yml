@@ -6,11 +6,13 @@ on:
       - 'v*'
 
 permissions:
+  id-token: write  # necessário para OIDC
   contents: read
 
 jobs:
-  build-and-publish:
-    name: Build and Publish to PyPI
+  publish:
+    name: Publish to PyPI
+    environment: release  # você pode mudar o nome aqui se quiser
     runs-on: ubuntu-latest
 
     steps:
@@ -31,9 +33,7 @@ jobs:
         run: |
           python -m build
 
-      - name: Publish to PyPI
-        env:
-          TWINE_USERNAME: __token__
-          TWINE_PASSWORD: ${{ secrets.PYPI_API_TOKEN }}
-        run: |
-          twine upload dist/*
+      - name: Publish to PyPI via OIDC
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          skip-existing: true  # opcional: ignora se versão já estiver publicada
