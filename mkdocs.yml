@@ -34,8 +34,11 @@ plugins:
   - i18n:
       default_language: pt
       languages:
-        pt: Português
-        en: English
+        - locale: pt
+          name: Português
+        - locale: en
+          name: English
+
 
 nav:
   - pt:
