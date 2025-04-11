@@ -27,7 +27,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          pip install mkdocs mkdocs-material
+          pip install mkdocs mkdocs-material mkdocs-static-i18n
 
       - name: Deploy documentation to GitHub Pages
         run: mkdocs gh-deploy --force
