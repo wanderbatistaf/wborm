@@ -1,0 +1,1513 @@
+
+<!doctype html>
+<html lang="pt" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="ORM leve com suporte a JDBC e Informix">
+      
+      
+        <meta name="author" content="Wanderson Batista">
+      
+      
+        <link rel="canonical" href="https://wanderbatistaf.github.io/wborm/changelog/">
+      
+      
+        <link rel="prev" href="../integra-wbjdbc/">
+      
+      
+        <link rel="next" href="../por-que-usar/">
+      
+      
+      <link rel="icon" href="../images/wborm.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.11">
+    
+    
+      
+        <title>Changelog - WBORM</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.4af4bdda.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.06af60db.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/extra.css">
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#changelog-novos-modulos-e-funcionalidades" class="md-skip">
+          Ir para o conteúdo
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Cabeçalho">
+    <a href=".." title="WBORM" class="md-header__button md-logo" aria-label="WBORM" data-md-component="logo">
+      
+  <img src="../images/wborm.png" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            WBORM
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Changelog
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-hidden="true"  type="radio" name="__palette" id="__palette_0">
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+      <div class="md-header__option">
+  <div class="md-select">
+    
+    <button class="md-header__button md-icon" aria-label="Selecione o idioma">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m12.87 15.07-2.54-2.51.03-.03A17.5 17.5 0 0 0 14.07 6H17V4h-7V2H8v2H1v2h11.17C11.5 7.92 10.44 9.75 9 11.35 8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5 3.11 3.11zM18.5 10h-2L12 22h2l1.12-3h4.75L21 22h2zm-2.62 7 1.62-4.33L19.12 17z"/></svg>
+    </button>
+    <div class="md-select__inner">
+      <ul class="md-select__list">
+        
+          <li class="md-select__item">
+            <a href="./" hreflang="pt" class="md-select__link">
+              Português
+            </a>
+          </li>
+        
+          <li class="md-select__item">
+            <a href="../en/changelog/" hreflang="en" class="md-select__link">
+              English
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</div>
+    
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/wanderbatistaf/wborm" title="Ir ao repositório" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512"><!--! Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8M97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    wanderbatistaf/wborm
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Abas" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href=".." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Início
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../modelos/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Modelos
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../exemplos/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Exemplos
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../integra-wbjdbc/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Integração wbjdbc
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    <li class="md-tabs__item md-tabs__item--active">
+      <a href="./" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Changelog
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../por-que-usar/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Sobre
+
+      </a>
+    </li>
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+  
+
+<nav class="md-nav md-nav--primary md-nav--lifted md-nav--integrated" aria-label="Navegação" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="WBORM" class="md-nav__button md-logo" aria-label="WBORM" data-md-component="logo">
+      
+  <img src="../images/wborm.png" alt="logo">
+
+    </a>
+    WBORM
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/wanderbatistaf/wborm" title="Ir ao repositório" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512"><!--! Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8M97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    wanderbatistaf/wborm
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Início
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../modelos/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Modelos
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../exemplos/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Exemplos
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../integra-wbjdbc/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Integração wbjdbc
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    Changelog
+    
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    Changelog
+    
+  </span>
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Índice">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Índice
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#changelog-novos-modulos-e-funcionalidades" class="md-nav__link">
+    <span class="md-ellipsis">
+      📝 Changelog – Novos Módulos e Funcionalidades
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="📝 Changelog – Novos Módulos e Funcionalidades">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#registrypy-registro-global-de-modelos-e-cache" class="md-nav__link">
+    <span class="md-ellipsis">
+      📚 Registry.py – Registro Global de Modelos e Cache
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="📚 Registry.py – Registro Global de Modelos e Cache">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#estrutura-global" class="md-nav__link">
+    <span class="md-ellipsis">
+      🗂️ Estrutura Global
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#model_cachepy-persistencia-de-modelos-em-disco" class="md-nav__link">
+    <span class="md-ellipsis">
+      📦 Model_cache.py – Persistência de Modelos em Disco
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="📦 Model_cache.py – Persistência de Modelos em Disco">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#criptografia-e-armazenamento" class="md-nav__link">
+    <span class="md-ellipsis">
+      🔐 Criptografia e Armazenamento
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#funcoes-principais" class="md-nav__link">
+    <span class="md-ellipsis">
+      📤 Funções Principais
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#seguranca" class="md-nav__link">
+    <span class="md-ellipsis">
+      🔑 Segurança
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#expressionspy-expressoes-sql-customizadas" class="md-nav__link">
+    <span class="md-ellipsis">
+      🧠 Expressions.py – Expressões SQL Customizadas
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="🧠 Expressions.py – Expressões SQL Customizadas">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#expressoes-declarativas" class="md-nav__link">
+    <span class="md-ellipsis">
+      📐 Expressões Declarativas
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#funcoes-utilitarias-para-consultas" class="md-nav__link">
+    <span class="md-ellipsis">
+      🔧 Funções utilitárias para consultas
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#utilspy" class="md-nav__link">
+    <span class="md-ellipsis">
+      📝 Utils.py
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="📝 Utils.py">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#novas-funcionalidades" class="md-nav__link">
+    <span class="md-ellipsis">
+      🚀 Novas Funcionalidades
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#aprimoramentos" class="md-nav__link">
+    <span class="md-ellipsis">
+      🔧 Aprimoramentos
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#remocoes" class="md-nav__link">
+    <span class="md-ellipsis">
+      🗑️ Remoções
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#observacoes-tecnicas" class="md-nav__link">
+    <span class="md-ellipsis">
+      ⚠️ Observações Técnicas
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#introspectpy" class="md-nav__link">
+    <span class="md-ellipsis">
+      📝 Introspect.py
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="📝 Introspect.py">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#melhoria-robusta-na-funcao-get_foreign_keys" class="md-nav__link">
+    <span class="md-ellipsis">
+      🚀 Melhoria Robusta na Função get_foreign_keys()
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="🚀 Melhoria Robusta na Função get_foreign_keys()">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#analise-de-chaves-estrangeiras-fk-com-base-em-indices" class="md-nav__link">
+    <span class="md-ellipsis">
+      🔍 Análise de Chaves Estrangeiras (FK) com Base em Índices
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#correcoes-semanticas-e-de-precisao" class="md-nav__link">
+    <span class="md-ellipsis">
+      🧠 Correções Semânticas e de Precisão
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#tratamento-com-coalesce" class="md-nav__link">
+    <span class="md-ellipsis">
+      🧹 Tratamento com COALESCE
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#outros-ajustes-tecnicos" class="md-nav__link">
+    <span class="md-ellipsis">
+      🛠️ Outros Ajustes Técnicos
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#nenhuma-alteracao-em-introspect_table" class="md-nav__link">
+    <span class="md-ellipsis">
+      ✅ Nenhuma alteração em introspect_table()
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#querypy" class="md-nav__link">
+    <span class="md-ellipsis">
+      📝 Query.py
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="📝 Query.py">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#novas-funcionalidades_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      🚀 Novas Funcionalidades
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="🚀 Novas Funcionalidades">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#cache-de-resultados-de-consultas" class="md-nav__link">
+    <span class="md-ellipsis">
+      🧠 Cache de Resultados de Consultas
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#classe-resultset-com-metodos-avancados" class="md-nav__link">
+    <span class="md-ellipsis">
+      🧾 Classe ResultSet com Métodos Avançados
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#funcao-pivot" class="md-nav__link">
+    <span class="md-ellipsis">
+      📊 Função pivot(...)
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#funcao-show-no-queryset" class="md-nav__link">
+    <span class="md-ellipsis">
+      🧪 Função show(...) no QuerySet
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#suporte-a-subqueries-via-join" class="md-nav__link">
+    <span class="md-ellipsis">
+      🧩 Suporte a Subqueries via Join
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#criacao-de-tabelas-temporarias-encadeada" class="md-nav__link">
+    <span class="md-ellipsis">
+      🧪 Criação de Tabelas Temporárias Encadeada
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#melhorias-em-funcionalidades-existentes" class="md-nav__link">
+    <span class="md-ellipsis">
+      🔧 Melhorias em Funcionalidades Existentes
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#remocoes-alteracoes-descontinuadas" class="md-nav__link">
+    <span class="md-ellipsis">
+      🗑️ Remoções / Alterações Descontinuadas
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#melhorias-visuais-e-de-ux" class="md-nav__link">
+    <span class="md-ellipsis">
+      🎨 Melhorias Visuais e de UX
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#internals-e-tecnicas" class="md-nav__link">
+    <span class="md-ellipsis">
+      ⚙️ Internals e Técnicas
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#corepy" class="md-nav__link">
+    <span class="md-ellipsis">
+      📝 Core.py
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="📝 Core.py">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#novas-funcionalidades_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      🚀 Novas Funcionalidades
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="🚀 Novas Funcionalidades">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#suporte-a-metodos-dinamicos-de-queryset" class="md-nav__link">
+    <span class="md-ellipsis">
+      🧬 Suporte a métodos dinâmicos de QuerySet
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#criacao-de-tabelas-temporarias" class="md-nav__link">
+    <span class="md-ellipsis">
+      📦 Criação de Tabelas Temporárias
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#visualizacao-avancada-modelshow" class="md-nav__link">
+    <span class="md-ellipsis">
+      📊 Visualização Avançada: Model.show(...)
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pivot-dinamico-via-modelpivot" class="md-nav__link">
+    <span class="md-ellipsis">
+      🔁 Pivot Dinâmico via Model.pivot(...)
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#relacoes-modeladas-visivelmente-modeldescribe_relations" class="md-nav__link">
+    <span class="md-ellipsis">
+      🔍 Relações Modeladas Visivelmente: Model.describe_relations()
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#melhorias-significativas" class="md-nav__link">
+    <span class="md-ellipsis">
+      🔧 Melhorias Significativas
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#remocoes-alteracoes-descontinuadas_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      🗑️ Remoções / Alterações Descontinuadas
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#melhorias-de-interface-e-ux" class="md-nav__link">
+    <span class="md-ellipsis">
+      🎨 Melhorias de Interface e UX
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#tecnicas-e-estruturais" class="md-nav__link">
+    <span class="md-ellipsis">
+      🛠️ Técnicas e Estruturais
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#__init__py" class="md-nav__link">
+    <span class="md-ellipsis">
+      📝 __init__.py
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="📝 __init__.py">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#novos-recursos-exportados-publicamente" class="md-nav__link">
+    <span class="md-ellipsis">
+      🚀 Novos Recursos Exportados Publicamente
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="🚀 Novos Recursos Exportados Publicamente">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#expressoes-e-funcoes-utilitarias" class="md-nav__link">
+    <span class="md-ellipsis">
+      📐 Expressões e Funções Utilitárias
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#exportacao-explicita-com-__all__" class="md-nav__link">
+    <span class="md-ellipsis">
+      🧭 Exportação Explícita com __all__
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#retrocompatibilidade-mantida" class="md-nav__link">
+    <span class="md-ellipsis">
+      ✅ Retrocompatibilidade Mantida
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../por-que-usar/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Sobre
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+  <h1>Changelog</h1>
+
+<h2 id="changelog-novos-modulos-e-funcionalidades">📝 <strong>Changelog – Novos Módulos e Funcionalidades</strong><a class="headerlink" href="#changelog-novos-modulos-e-funcionalidades" title="Permanent link">&para;</a></h2>
+<hr />
+<h3 id="registrypy-registro-global-de-modelos-e-cache">📚 <code>Registry.py</code> – <strong>Registro Global de Modelos e Cache</strong><a class="headerlink" href="#registrypy-registro-global-de-modelos-e-cache" title="Permanent link">&para;</a></h3>
+<h4 id="estrutura-global">🗂️ Estrutura Global<a class="headerlink" href="#estrutura-global" title="Permanent link">&para;</a></h4>
+<ul>
+<li><code>_model_registry</code>: armazena todas as classes <code>Model</code> já geradas e disponíveis para autocomplete e reuso.</li>
+<li><code>_model_cache</code>: mapeia modelos por <code>(table_name, conn_id)</code> para evitar recriação redundante.</li>
+<li><code>_query_result_cache</code>: cache em memória de resultados de queries, com TTL, usado em <code>QuerySet</code>.</li>
+</ul>
+<blockquote>
+<p>Este módulo fornece a base para funcionalidades como:
+- Cache de queries (com <code>live()</code> para bypass).
+- Reload automático de modelos.
+- Geração de stubs baseados em modelos carregados dinamicamente.</p>
+</blockquote>
+<hr />
+<h3 id="model_cachepy-persistencia-de-modelos-em-disco">📦 <code>Model_cache.py</code> – <strong>Persistência de Modelos em Disco</strong><a class="headerlink" href="#model_cachepy-persistencia-de-modelos-em-disco" title="Permanent link">&para;</a></h3>
+<h4 id="criptografia-e-armazenamento">🔐 Criptografia e Armazenamento<a class="headerlink" href="#criptografia-e-armazenamento" title="Permanent link">&para;</a></h4>
+<ul>
+<li>Implementado mecanismo de <strong>cache criptografado de modelos</strong> em <code>.wbmodels/</code> com chave Fernet salva em <code>.wbormkey</code>.</li>
+<li>Os modelos são serializados com <code>pickle</code>, criptografados e salvos com a extensão <code>.wbm</code>.</li>
+</ul>
+<h4 id="funcoes-principais">📤 Funções Principais<a class="headerlink" href="#funcoes-principais" title="Permanent link">&para;</a></h4>
+<ul>
+<li><code>save_model_to_disk(table_name, model_cls)</code></li>
+<li>Salva um modelo ORM como dicionário de atributos serializáveis (campos e relações).</li>
+<li><code>try_load_model_from_disk(table_name, conn)</code></li>
+<li>Tenta carregar um modelo previamente salvo, reconstruindo a classe com <code>ModelMeta</code>, registrando no cache e módulo principal.</li>
+<li><code>generate_model_stub(output_path)</code></li>
+<li>Gera automaticamente o arquivo <code>.pyi</code> para autocomplete com base nos modelos registrados.</li>
+<li>Produz anotações de tipo para editores com base em campos e nullability.</li>
+</ul>
+<h4 id="seguranca">🔑 Segurança<a class="headerlink" href="#seguranca" title="Permanent link">&para;</a></h4>
+<ul>
+<li>Utiliza <code>cryptography.fernet.Fernet</code> para garantir que o cache seja seguro, mesmo se exposto.</li>
+</ul>
+<hr />
+<h3 id="expressionspy-expressoes-sql-customizadas">🧠 <code>Expressions.py</code> – <strong>Expressões SQL Customizadas</strong><a class="headerlink" href="#expressionspy-expressoes-sql-customizadas" title="Permanent link">&para;</a></h3>
+<h4 id="expressoes-declarativas">📐 Expressões Declarativas<a class="headerlink" href="#expressoes-declarativas" title="Permanent link">&para;</a></h4>
+<ul>
+<li><strong>Classe <code>Expression</code></strong> permite construir expressões SQL de forma fluida e segura:</li>
+<li>Operadores implementados: <code>==</code>, <code>!=</code>, <code>&gt;</code>, <code>&lt;</code>, <code>&gt;=</code>, <code>&lt;=</code>.</li>
+<li>Integração com valores do tipo <code>datetime</code> com conversão automática.</li>
+</ul>
+<h4 id="funcoes-utilitarias-para-consultas">🔧 Funções utilitárias para consultas<a class="headerlink" href="#funcoes-utilitarias-para-consultas" title="Permanent link">&para;</a></h4>
+<ul>
+<li><code>col(name)</code> – cria expressão com base em nome de coluna.</li>
+<li><code>date(field)</code> – envolve campo com <code>DATE(...)</code> do Informix.</li>
+<li><code>now()</code> – insere a expressão <code>CURRENT</code>.</li>
+<li><code>raw(expr)</code> – insere SQL arbitrário diretamente.</li>
+<li><code>format_informix_datetime(value)</code> – converte <code>datetime</code> ou <code>str</code> para formato <code>DATETIME(...) YEAR TO SECOND</code>, suportando ISO8601 ou fallback para strings brutas.</li>
+</ul>
+<blockquote>
+<p>Essas funções já estão expostas no pacote principal via <code>__init__.py</code>, permitindo:
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">wborm</span><span class="w"> </span><span class="kn">import</span> <span class="n">col</span><span class="p">,</span> <span class="n">now</span><span class="p">,</span> <span class="n">raw</span>
+</code></pre></div></p>
+</blockquote>
+<hr />
+<h2 id="utilspy">📝 <strong><code>Utils.py</code></strong><a class="headerlink" href="#utilspy" title="Permanent link">&para;</a></h2>
+<h3 id="novas-funcionalidades">🚀 <strong>Novas Funcionalidades</strong><a class="headerlink" href="#novas-funcionalidades" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Persistência de modelos em disco (cache local)</strong></li>
+<li>Adição da verificação de modelos armazenados via <code>try_load_model_from_disk()</code> antes de gerar novamente.</li>
+<li>
+<p>Os modelos gerados são salvos com <code>save_model_to_disk()</code> para reutilização futura sem nova introspecção.</p>
+</li>
+<li>
+<p><strong>Injeção automática no escopo global</strong></p>
+</li>
+<li>
+<p>Nova funcionalidade com <code>inject_globals=True</code> para permitir que os modelos sejam automaticamente atribuídos a variáveis globais com o nome da tabela.</p>
+</li>
+<li>
+<p><strong>Stub de autocomplete</strong></p>
+</li>
+<li>
+<p>Introdução de <code>generate_model_stub()</code> após geração de modelos, preparando arquivos <code>.pyi</code> para suporte a autocomplete em editores de código.</p>
+</li>
+<li>
+<p><strong>Listagem de modelos</strong></p>
+</li>
+<li>
+<p>Nova função <code>list_models()</code> que permite:</p>
+<ul>
+<li>Listar todos os modelos carregados do banco de dados se houver uma conexão.</li>
+<li>Listar modelos armazenados no cache <code>.wbmodels/</code> se não houver conexão ativa, com descriptografia via <code>cryptography.fernet</code>.</li>
+</ul>
+</li>
+<li>
+<p><strong>Geração em lote de modelos</strong></p>
+</li>
+<li>
+<p>Nova função <code>generate_all_models(conn)</code> para introspecção automática de todas as tabelas (e opcionalmente views), com controle de verbosity e injeção em escopo.</p>
+</li>
+<li>
+<p><strong>Acesso seguro a modelos por nome</strong></p>
+</li>
+<li>
+<p>Função <code>get_model_by_name(name)</code> permite acesso direto ao modelo carregado a partir do <code>_model_registry</code>.</p>
+</li>
+<li>
+<p><strong>Criação de tabelas temporárias a partir de queryset</strong></p>
+</li>
+<li>Adição da função <code>create_temp_table_from_queryset(...)</code> que permite gerar tabelas temporárias (<code>TEMP TABLE</code>) a partir de uma consulta ORM.</li>
+</ul>
+<hr />
+<h3 id="aprimoramentos">🔧 <strong>Aprimoramentos</strong><a class="headerlink" href="#aprimoramentos" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Tratamento de exceções em FKs</strong></li>
+<li>
+<p>Implementado <code>try/except</code> com mensagem de aviso amigável ao ignorar falhas na leitura de FKs.</p>
+</li>
+<li>
+<p><strong>Módulo do modelo explicitamente definido</strong></p>
+</li>
+<li>
+<p>Atributo <code>__module__</code> dos modelos agora é definido como <code>"wborm.core"</code>, garantindo rastreabilidade correta e suporte ao autocomplete.</p>
+</li>
+<li>
+<p><strong>Registro global de modelos</strong></p>
+</li>
+<li>
+<p>Modelos agora também são armazenados em <code>_model_registry</code>, além do <code>_model_cache</code>, permitindo recuperação nominal direta.</p>
+</li>
+<li>
+<p><strong>Melhoria no mapeamento de nomes</strong></p>
+</li>
+<li>
+<p>Os nomes de variáveis e atributos agora são tratados explicitamente como <code>str(col["name"])</code> para evitar inconsistências.</p>
+</li>
+<li>
+<p><strong>Distribuição de importações</strong></p>
+</li>
+<li>Organização mais clara dos <code>imports</code>, separando o uso de bibliotecas externas (<code>cryptography</code>, <code>pickle</code>) e módulos internos (<code>wborm.registry</code>, <code>wborm.model_cache</code> etc.).</li>
+</ul>
+<hr />
+<h3 id="remocoes">🗑️ <strong>Remoções</strong><a class="headerlink" href="#remocoes" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Nenhuma funcionalidade foi removida. A nova versão mantém <strong>retrocompatibilidade total</strong>, ampliando as capacidades existentes.</li>
+</ul>
+<hr />
+<h3 id="observacoes-tecnicas">⚠️ <strong>Observações Técnicas</strong><a class="headerlink" href="#observacoes-tecnicas" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Para o correto funcionamento do cache local, é necessário garantir que:</li>
+<li>A chave de criptografia está acessível (<code>get_or_create_key()</code>).</li>
+<li>O diretório <code>.wbmodels/</code> esteja presente e com permissões adequadas.</li>
+<li>A introspecção de FKs pode ser ignorada silenciosamente em caso de falhas, garantindo robustez mas ocultando erros mais sutis se não logado em detalhes.</li>
+</ul>
+<hr />
+<h2 id="introspectpy">📝 <strong><code>Introspect.py</code></strong><a class="headerlink" href="#introspectpy" title="Permanent link">&para;</a></h2>
+<h3 id="melhoria-robusta-na-funcao-get_foreign_keys">🚀 <strong>Melhoria Robusta na Função <code>get_foreign_keys()</code></strong><a class="headerlink" href="#melhoria-robusta-na-funcao-get_foreign_keys" title="Permanent link">&para;</a></h3>
+<h4 id="analise-de-chaves-estrangeiras-fk-com-base-em-indices">🔍 <strong>Análise de Chaves Estrangeiras (FK) com Base em Índices</strong><a class="headerlink" href="#analise-de-chaves-estrangeiras-fk-com-base-em-indices" title="Permanent link">&para;</a></h4>
+<ul>
+<li>A consulta agora utiliza <strong><code>sysindexes</code></strong> para identificar corretamente as colunas envolvidas nos relacionamentos, tanto no lado da chave estrangeira quanto da chave primária.</li>
+<li>Suporte a até <strong>16 colunas de índice</strong> (usando <code>part1</code> a <code>part16</code>), permitindo detectar relacionamentos compostos com múltiplas colunas.</li>
+</ul>
+<h4 id="correcoes-semanticas-e-de-precisao">🧠 <strong>Correções Semânticas e de Precisão</strong><a class="headerlink" href="#correcoes-semanticas-e-de-precisao" title="Permanent link">&para;</a></h4>
+<ul>
+<li>Substituição do join direto por <code>r.tabid = fk.tabid</code> para o uso de <code>c.tabid = fk.tabid</code>, garantindo precisão na tabela filha (<code>fk</code>).</li>
+<li>Inclusão do filtro <code>idx_fk.part1 IS NOT NULL AND idx_pk.part1 IS NOT NULL</code> para garantir que apenas relacionamentos com colunas de índice reais sejam retornados, evitando registros corrompidos ou incompletos.</li>
+</ul>
+<h4 id="tratamento-com-coalesce">🧹 <strong>Tratamento com <code>COALESCE</code></strong><a class="headerlink" href="#tratamento-com-coalesce" title="Permanent link">&para;</a></h4>
+<ul>
+<li>Uso de <code>COALESCE(..., '')</code> garante robustez ao comparar nomes de tabelas com possíveis valores nulos, evitando falhas silenciosas ou quebras por <code>NULL</code>.</li>
+</ul>
+<hr />
+<h3 id="outros-ajustes-tecnicos">🛠️ <strong>Outros Ajustes Técnicos</strong><a class="headerlink" href="#outros-ajustes-tecnicos" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Indentação SQL melhorada</strong> para clareza e leitura.</li>
+<li>Os aliases <code>fk</code>, <code>pk</code>, <code>fc</code> e <code>pc</code> permanecem os mesmos, mas agora baseados em um cruzamento mais preciso com os índices referenciados nas constraints.</li>
+<li>Estrutura da query refatorada para melhor manutenção futura e consistência com bancos que seguem o padrão Informix para metadados.</li>
+</ul>
+<hr />
+<h3 id="nenhuma-alteracao-em-introspect_table">✅ <strong>Nenhuma alteração em <code>introspect_table()</code></strong><a class="headerlink" href="#nenhuma-alteracao-em-introspect_table" title="Permanent link">&para;</a></h3>
+<p>A função <code>introspect_table(...)</code> permanece <strong>inalterada</strong> entre as versões antiga e nova. Portanto:</p>
+<ul>
+<li>Sem impacto em chamadas existentes.</li>
+<li>Mesma estrutura de introspecção de colunas.</li>
+</ul>
+<hr />
+<h2 id="querypy">📝 <strong><code>Query.py</code></strong><a class="headerlink" href="#querypy" title="Permanent link">&para;</a></h2>
+<h3 id="novas-funcionalidades_1">🚀 <strong>Novas Funcionalidades</strong><a class="headerlink" href="#novas-funcionalidades_1" title="Permanent link">&para;</a></h3>
+<h4 id="cache-de-resultados-de-consultas">🧠 <strong>Cache de Resultados de Consultas</strong><a class="headerlink" href="#cache-de-resultados-de-consultas" title="Permanent link">&para;</a></h4>
+<ul>
+<li>Introduzido cache local de resultados (<code>_query_result_cache</code>) com TTL configurável (<code>_cache_ttl = 60</code> segundos por padrão).</li>
+<li>Nova função <code>live()</code> para desativar temporariamente o cache em uma consulta específica.</li>
+<li>Verificação e reutilização de resultados cacheados em <code>all()</code> para otimizar desempenho.</li>
+</ul>
+<h4 id="classe-resultset-com-metodos-avancados">🧾 <strong>Classe ResultSet com Métodos Avançados</strong><a class="headerlink" href="#classe-resultset-com-metodos-avancados" title="Permanent link">&para;</a></h4>
+<ul>
+<li>Nova classe <code>ResultSet</code> herda de <code>list</code> e adiciona:</li>
+<li><code>show(tablefmt="grid")</code>: renderização de resultados com <code>tabulate</code>, com destaque de cor (verde para consulta ao vivo, azul para cache).</li>
+<li>Suporte a colunas dinâmicas com detecção automática ou baseadas em <code>select(...)</code>.</li>
+<li>Remoção automática de colunas 100% vazias.</li>
+</ul>
+<h4 id="funcao-pivot">📊 <strong>Função <code>pivot(...)</code></strong><a class="headerlink" href="#funcao-pivot" title="Permanent link">&para;</a></h4>
+<ul>
+<li>Novo método <code>pivot(...)</code> permite transformar a saída em uma visualização estilo <strong>tabela dinâmica</strong>, com indexação, colunas cruzadas e valores preenchidos.</li>
+<li>Uso de <code>tabulate</code>, cores de terminal ANSI e performance otimizada.</li>
+</ul>
+<h4 id="funcao-show-no-queryset">🧪 <strong>Função <code>show(...)</code> no QuerySet</strong><a class="headerlink" href="#funcao-show-no-queryset" title="Permanent link">&para;</a></h4>
+<ul>
+<li>Método <code>show()</code> que simplesmente chama <code>all().show(...)</code> com suporte a formato tabular customizável.</li>
+</ul>
+<h4 id="suporte-a-subqueries-via-join">🧩 <strong>Suporte a Subqueries via Join</strong><a class="headerlink" href="#suporte-a-subqueries-via-join" title="Permanent link">&para;</a></h4>
+<ul>
+<li>Método <code>join()</code> agora aceita um <code>QuerySet</code> com alias definido por <code>.as_temp_table(alias)</code>, permitindo joins com subqueries SQL completas.</li>
+</ul>
+<h4 id="criacao-de-tabelas-temporarias-encadeada">🧪 <strong>Criação de Tabelas Temporárias Encadeada</strong><a class="headerlink" href="#criacao-de-tabelas-temporarias-encadeada" title="Permanent link">&para;</a></h4>
+<ul>
+<li>Método <code>create_temp_table(...)</code> disponível diretamente em um <code>QuerySet</code> para gerar uma tabela temporária com base na query atual e retornar automaticamente o modelo associado.</li>
+</ul>
+<hr />
+<h3 id="melhorias-em-funcionalidades-existentes">🔧 <strong>Melhorias em Funcionalidades Existentes</strong><a class="headerlink" href="#melhorias-em-funcionalidades-existentes" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong><code>filter(...)</code> mais poderoso</strong></li>
+<li>
+<p>Agora aceita expressões livres como strings (<code>filter("age &gt; 30")</code>) e objetos <code>ColumnExpr</code>, além do tradicional <code>filter(campo=valor)</code> com escaping seguro de aspas simples.</p>
+</li>
+<li>
+<p><strong><code>join(...)</code> com cláusula ON flexível</strong></p>
+</li>
+<li>
+<p>Agora aceita:</p>
+<ul>
+<li>Lista/tupla de colunas para <code>ON a.col = b.col</code>.</li>
+<li>Expressão simples (<code>"user_id"</code>) assumindo igualdade padrão.</li>
+<li>Expressão SQL customizada.</li>
+</ul>
+</li>
+<li>
+<p><strong>Criação explícita de instâncias</strong></p>
+</li>
+<li>
+<p>Método <code>_create_instance_from_row(...)</code> cria objetos com fallback direto ao <code>__dict__</code> se o campo não estiver em <code>_fields</code>.</p>
+</li>
+<li>
+<p><strong><code>select(...)</code> propaga campos para o <code>ResultSet</code></strong></p>
+</li>
+<li>
+<p>Permite renderização mais precisa e ordenada de colunas.</p>
+</li>
+<li>
+<p><strong>Escape seguro em <code>count()</code></strong></p>
+</li>
+<li>Protege os valores de filtro contra SQL Injection com <code>str(v).replace("'", "''")</code>.</li>
+</ul>
+<hr />
+<h3 id="remocoes-alteracoes-descontinuadas">🗑️ <strong>Remoções / Alterações Descontinuadas</strong><a class="headerlink" href="#remocoes-alteracoes-descontinuadas" title="Permanent link">&para;</a></h3>
+<ul>
+<li>A função <code>preload(...)</code> foi <strong>removida</strong> no novo código. A pré-carga de relações precisa ser reimplementada caso seja necessária.</li>
+<li>A lógica heurística de FKs inversas em <code>preload(...)</code> (baseada em <code>id</code> ou <code>&lt;rel&gt;_id</code>) foi descontinuada.</li>
+<li>O método <code>all()</code> agora retorna um <code>ResultSet</code>, em vez de uma lista simples.</li>
+</ul>
+<hr />
+<h3 id="melhorias-visuais-e-de-ux">🎨 <strong>Melhorias Visuais e de UX</strong><a class="headerlink" href="#melhorias-visuais-e-de-ux" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Integração com <code>colorama</code> para <strong>colorir bordas</strong> de tabelas no terminal conforme origem dos dados (cache ou vivo).</li>
+<li>Utilização de <code>tabulate</code> com diversos formatos para facilitar leitura em CLI.</li>
+</ul>
+<hr />
+<h3 id="internals-e-tecnicas">⚙️ <strong>Internals e Técnicas</strong><a class="headerlink" href="#internals-e-tecnicas" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Inclusão de hashing (<code>sha256</code>) para cache de consultas baseado no texto SQL.</li>
+<li>Identificação de subqueries exige <code>._as_temp_table_alias</code> definido previamente para segurança.</li>
+<li>Compatível com <code>generate_model()</code> atualizado para modelos temporários injetáveis.</li>
+</ul>
+<hr />
+<h2 id="corepy">📝 <strong><code>Core.py</code></strong><a class="headerlink" href="#corepy" title="Permanent link">&para;</a></h2>
+<h3 id="novas-funcionalidades_2">🚀 <strong>Novas Funcionalidades</strong><a class="headerlink" href="#novas-funcionalidades_2" title="Permanent link">&para;</a></h3>
+<h4 id="suporte-a-metodos-dinamicos-de-queryset">🧬 Suporte a métodos dinâmicos de <code>QuerySet</code><a class="headerlink" href="#suporte-a-metodos-dinamicos-de-queryset" title="Permanent link">&para;</a></h4>
+<ul>
+<li><strong>Interceptação automática via <code>__getattr__</code> na metaclasse <code>ModelMeta</code></strong>:</li>
+<li>Permite invocar qualquer método disponível no <code>QuerySet</code> diretamente pela classe modelo, como <code>User.limit(10).show()</code>.</li>
+<li>Exemplo: <code>Model.join(...)</code>, <code>Model.show()</code>, <code>Model.pivot(...)</code>, etc., mesmo sem declarar manualmente.</li>
+</ul>
+<h4 id="criacao-de-tabelas-temporarias">📦 Criação de Tabelas Temporárias<a class="headerlink" href="#criacao-de-tabelas-temporarias" title="Permanent link">&para;</a></h4>
+<ul>
+<li><strong>Novo método <code>create_temp_table()</code></strong> (em dois níveis: instância e classe):</li>
+<li>Gera automaticamente a estrutura SQL com base nos campos do modelo.</li>
+<li>Usa <code>CREATE TEMP TABLE ...</code> com log visual via <code>cprint</code>.</li>
+<li>Útil para joins intermediários e persistência temporária de resultados filtrados.</li>
+</ul>
+<h4 id="visualizacao-avancada-modelshow">📊 Visualização Avançada: <code>Model.show(...)</code><a class="headerlink" href="#visualizacao-avancada-modelshow" title="Permanent link">&para;</a></h4>
+<ul>
+<li>Exibe resultados no terminal com <code>tabulate</code>, até 50 registros por padrão (ou filtrado).</li>
+<li>Renderiza com <strong>cores no terminal</strong> usando <code>colorama</code>:</li>
+<li>Azul (🔵) se o modelo for proveniente de cache.</li>
+<li>Verde (🟢) se for carregado dinamicamente.</li>
+</ul>
+<h4 id="pivot-dinamico-via-modelpivot">🔁 Pivot Dinâmico via <code>Model.pivot(...)</code><a class="headerlink" href="#pivot-dinamico-via-modelpivot" title="Permanent link">&para;</a></h4>
+<ul>
+<li>Geração de tabela dinâmica (<code>pivot</code>) diretamente pelo modelo, com suporte a filtros e agregações (<code>aggfunc="count"</code> por padrão).</li>
+</ul>
+<h4 id="relacoes-modeladas-visivelmente-modeldescribe_relations">🔍 Relações Modeladas Visivelmente: <code>Model.describe_relations()</code><a class="headerlink" href="#relacoes-modeladas-visivelmente-modeldescribe_relations" title="Permanent link">&para;</a></h4>
+<ul>
+<li>Lista todas as relações mapeadas automaticamente para o modelo, exibindo nome do relacionamento e tabela de destino.</li>
+</ul>
+<hr />
+<h3 id="melhorias-significativas">🔧 Melhorias Significativas<a class="headerlink" href="#melhorias-significativas" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Melhoria na introspecção de campos (<code>ModelMeta</code>)</strong>:</li>
+<li>
+<p>Usa <code>str(k)</code> para garantir compatibilidade com chaves não-string (robustez com introspecção dinâmica ou subclasses especiais).</p>
+</li>
+<li>
+<p><strong>Refinamento em <code>to_dict()</code></strong>:</p>
+</li>
+<li>
+<p>Agora ignora atributos que começam com <code>_</code> ou que são métodos, gerando um dicionário limpo apenas com dados úteis.</p>
+</li>
+<li>
+<p><strong>Melhoria na criação de tabelas (temporárias e fixas)</strong>:</p>
+</li>
+<li>Compactação da lógica de tipo SQL + flags <code>NOT NULL</code> e <code>PRIMARY KEY</code> com <code>.strip()</code> no final.</li>
+<li>Código mais legível e reutilizável.</li>
+</ul>
+<hr />
+<h3 id="remocoes-alteracoes-descontinuadas_1">🗑️ Remoções / Alterações Descontinuadas<a class="headerlink" href="#remocoes-alteracoes-descontinuadas_1" title="Permanent link">&para;</a></h3>
+<ul>
+<li>📤 <strong>Removido o método <code>show()</code> de instância</strong></li>
+<li>
+<p>Substituído por um <code>show()</code> de classe, mais útil e abrangente.</p>
+</li>
+<li>
+<p>📦 <strong>Método <code>preload()</code> do <code>QuerySet</code> ainda referenciado</strong>, mas provavelmente obsoleto (dependência que sumiu em <code>QuerySet</code> novo).</p>
+</li>
+<li>Pode ser removido futuramente se confirmado o desuso.</li>
+</ul>
+<hr />
+<h3 id="melhorias-de-interface-e-ux">🎨 Melhorias de Interface e UX<a class="headerlink" href="#melhorias-de-interface-e-ux" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Saída mais bonita</strong> com <code>colorama</code> para destaque de tabelas, relações e mensagens de criação.</li>
+<li><strong>Mensagens informativas</strong> ao criar tabelas (<code>🧪 Tabela temporária criada: ...</code>), deletar ou atualizar.</li>
+</ul>
+<hr />
+<h3 id="tecnicas-e-estruturais">🛠️ Técnicas e Estruturais<a class="headerlink" href="#tecnicas-e-estruturais" title="Permanent link">&para;</a></h3>
+<ul>
+<li><code>lazy_property</code> permanece como helper funcional, sem alterações.</li>
+<li><code>validate()</code> continua garantindo consistência e obrigatório antes de qualquer operação de persistência (<code>add</code>, <code>bulk_add</code>, etc.).</li>
+</ul>
+<hr />
+<h2 id="__init__py">📝 <strong><code>__init__.py</code></strong><a class="headerlink" href="#__init__py" title="Permanent link">&para;</a></h2>
+<h3 id="novos-recursos-exportados-publicamente">🚀 <strong>Novos Recursos Exportados Publicamente</strong><a class="headerlink" href="#novos-recursos-exportados-publicamente" title="Permanent link">&para;</a></h3>
+<p>Foram adicionados novos utilitários à API pública da biblioteca, permitindo um uso mais expressivo e direto de expressões SQL e funções auxiliares:</p>
+<h4 id="expressoes-e-funcoes-utilitarias">📐 Expressões e Funções Utilitárias<a class="headerlink" href="#expressoes-e-funcoes-utilitarias" title="Permanent link">&para;</a></h4>
+<ul>
+<li><strong><code>col</code></strong> – Criação de expressões baseadas em colunas (ex: <code>col("idade") &gt; 18</code>).</li>
+<li><strong><code>date</code></strong> – Conversão e manipulação de valores de data.</li>
+<li><strong><code>now</code></strong> – Data/hora atual para uso em filtros ou inserções.</li>
+<li><strong><code>raw</code></strong> – Inserção de SQL bruto diretamente em expressões.</li>
+<li><strong><code>format_informix_datetime</code></strong> – Utilitário para formatar datas no padrão aceito pelo Informix.</li>
+</ul>
+<blockquote>
+<p>Esses recursos vêm do novo módulo <code>expressions.py</code>, agora incluído como parte do pacote principal.</p>
+</blockquote>
+<hr />
+<h3 id="exportacao-explicita-com-__all__">🧭 <strong>Exportação Explícita com <code>__all__</code></strong><a class="headerlink" href="#exportacao-explicita-com-__all__" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Adição do bloco <code>__all__ = [...]</code>, tornando explícito o que é exportado ao usar <code>from wborm import *</code>, melhorando:</li>
+<li>Legibilidade e manutenção.</li>
+<li>Controle de namespace.</li>
+<li>Completude para IDEs e documentação automática.</li>
+</ul>
+<hr />
+<h3 id="retrocompatibilidade-mantida">✅ <strong>Retrocompatibilidade Mantida</strong><a class="headerlink" href="#retrocompatibilidade-mantida" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Todos os elementos anteriormente exportados (<code>Model</code>, <code>Field</code>, <code>generate_model</code>, <code>get_model</code>, <code>QuerySet</code>) continuam disponíveis sem alterações.</li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+        <div class="md-social">
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://github.com/wanderbatistaf" target="_blank" rel="noopener" title="github.com" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512"><!--! Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8M97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      <script id="__config" type="application/json">{"base": "..", "features": ["navigation.tabs", "navigation.sections", "navigation.indexes", "toc.integrate", "content.code.annotate", "search.suggest", "search.highlight"], "search": "../assets/javascripts/workers/search.f8cc74c7.min.js", "tags": null, "translations": {"clipboard.copied": "Copiado para \u00e1rea de transfer\u00eancia", "clipboard.copy": "Copiar para \u00e1rea de transfer\u00eancia", "search.result.more.one": "Mais 1 nesta p\u00e1gina", "search.result.more.other": "Mais # nesta p\u00e1gina", "search.result.none": "Nenhum resultado encontrado", "search.result.one": "1 resultado encontrado", "search.result.other": "# resultados encontrados", "search.result.placeholder": "Digite para iniciar a busca", "search.result.term.missing": "Ausente", "select.version": "Selecione a vers\u00e3o"}, "version": null}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.c8b220af.min.js"></script>
+      
+    
+  </body>
+</html>
