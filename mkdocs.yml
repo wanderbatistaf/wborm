@@ -9,7 +9,7 @@ edit_uri: edit/main/docs/
 
 theme:
   name: material
-  language: pt-BR
+  language: pt
   features:
     - navigation.tabs
     - navigation.sections
@@ -42,24 +42,13 @@ plugins:
           name: English
           build: true
 
-
-
 nav:
-  - pt:
-      - Início: index.md
-      - Modelos: modelos.md
-      - Exemplos: exemplos.md
-      - wbjdbc-wborm: integra-wbjdbc.md
-      - Changelog: changelog.md
-      - Sobre: por-que-usar.md
-  - en:
-      - Home: index.md
-      - Models: models.md
-      - Examples: examples.md
-      - wbjdbc-wborm: wbjdbc-wborm.md
-      - Changelog: changelog.md
-      - About: why-use.md
-
+  - Início: index.md
+  - Modelos: modelos.md
+  - Exemplos: exemplos.md
+  - Integração wbjdbc: integra-wbjdbc.md
+  - Changelog: changelog.md
+  - Sobre: por-que-usar.md
 
 markdown_extensions:
   - toc:
