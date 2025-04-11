@@ -1,3 +1,11 @@
+---
+title: Home
+lang: en
+build: true
+default: false
+---
+
+
 # WBORM – Official Documentation
 
 Welcome to the documentation for `wborm`, a lightweight and expressive ORM library built for SQL access via JDBC, with a focus on Informix but compatible with other systems.
