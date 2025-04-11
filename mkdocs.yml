@@ -36,8 +36,12 @@ plugins:
       languages:
         - locale: pt
           name: Português
+          default: true
+          build: true
         - locale: en
           name: English
+          build: true
+
 
 
 nav:
