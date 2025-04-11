@@ -30,12 +30,29 @@ theme:
 extra_css:
   - assets/stylesheets/extra.css
 
+plugins:
+  - i18n:
+      default_language: pt
+      languages:
+        pt: Português
+        en: English
+
 nav:
-  - Início: index.md
-  - Modelos: modelos.md
-  - Exemplos: exemplos.md
-  - wbjdbc-wborm: integra-wbjdbc.md
-  - Sobre: por-que-usar.md
+  - pt:
+      - Início: index.md
+      - Modelos: modelos.md
+      - Exemplos: exemplos.md
+      - wbjdbc-wborm: integra-wbjdbc.md
+      - Changelog: changelog.md
+      - Sobre: por-que-usar.md
+  - en:
+      - Home: index.md
+      - Models: models.md
+      - Examples: examples.md
+      - wbjdbc-wborm: wbjdbc-wborm.md
+      - Changelog: changelog.md
+      - About: why-use.md
+
 
 markdown_extensions:
   - toc:

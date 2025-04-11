@@ -10,11 +10,16 @@
 - Suporte completo a conexões JDBC via `wbjdbc`
 - Geração automática de modelos com introspecção
 - API fluente com `.select()`, `.filter()`, `.join()` e mais
+- Pivot e visualização tabular com bordas coloridas
+- Criação de tabelas temporárias com `.create_temp_table()`
 - Confirmação obrigatória em operações destrutivas
 - Bloqueio de UPDATE/DELETE sem WHERE
 - Transações automáticas com rollback
+- Cache de resultados com TTL e bypass com `.live()`
 - Integração com Pandas e Spark
-- Eager/lazy loading, cache, hooks e muito mais
+- Hooks como `before_add()` e `after_update()`
+- Criptografia e cache de modelos com `model_cache`
+- Stub `.pyi` automático para autocomplete
 
 ---
 
@@ -44,22 +49,24 @@ conn = connect_to_db(
 )
 ```
 
-### 2. Gerando modelo com introspecção
+### 2. Gerando modelos
 
 ```python
-from wborm.utils import generate_model
+from wborm.utils import generate_model, generate_all_models
 
-Cliente = generate_model("clientes", conn)
+# Modelo único:
+generate_model("clientes", conn)
+
+# Todos os modelos:
+generate_all_models(conn)
 ```
 
-> Isso detecta automaticamente os campos, tipos, PKs e campos nulos da tabela!
+> Os modelos são injetados automaticamente no escopo global com o nome da tabela, ex: `clientes`.
 
 ### 3. Consultando dados
 
 ```python
-clientes = Cliente.filter(idade=30).order_by("nome").all()
-for c in clientes:
-    print(c.nome)
+clientes.select("nome").filter("idade > 30").order_by("nome").limit(5).show()
 ```
 
 ---
@@ -79,15 +86,15 @@ class Cliente(Model):
 Cliente._connection = conn
 ```
 
-> Ideal para quem quer customizar comportamento, usar `create_table()` ou definir campos antes de existir no banco.
+> Ideal para customizações, uso com `.create_table()` ou definir campos antes da criação no banco.
 
 ---
 
 ## 🔒 Segurança embutida
 
 - `.add()`, `.update()` e `.delete()` exigem `confirm=True`
-- UPDATE/DELETE sem WHERE são bloqueados
-- Transações com `BEGIN WORK / COMMIT / ROLLBACK`
+- Bloqueio automático de UPDATE ou DELETE sem cláusula WHERE
+- Transações protegidas com `BEGIN WORK / COMMIT / ROLLBACK`
 
 ---
 
@@ -96,13 +103,38 @@ Cliente._connection = conn
 ```python
 import pandas as pd
 
-clientes = Cliente.all()
+clientes = clientes.all()
 df = pd.DataFrame([c.to_dict() for c in clientes])
 ```
 
 ```python
-spark.createDataFrame([c.to_dict() for c in Cliente.all()])
+spark.createDataFrame([c.to_dict() for c in clientes.all()])
 ```
+
+---
+
+## 📦 Cache e performance
+
+- Consultas são cacheadas automaticamente (`TTL = 60s` por padrão)
+- Use `.live()` para forçar leitura ao vivo:
+
+```python
+clientes.live().filter(ativo=True).all()
+```
+
+---
+
+## 📌 Cores no terminal
+
+### Logs (via `termcolor`)
+- ✅ Verde: inserções (`add`, `bulk_add`)
+- 🟡 Amarelo: atualizações (`update`)
+- ❌ Vermelho: erros ou exclusões (`delete`)
+- 🔵 Azul / 🔷 Ciano: mensagens informativas e tabelas de cache
+
+### Tabelas renderizadas com `show()` ou `pivot()`
+- Modelos criados dinamicamente: bordas **verdes**
+- Modelos carregados via cache: bordas **azuis**
 
 ---
 
@@ -113,10 +145,10 @@ Acesse:
 
 Inclui:
 - Guia de Início Rápido
-- Modelos com introspecção
-- Operadores, joins, filtros, agrupamentos
-- Lazy loading, hooks, cache, validações
-- Integração wbjdbc-wborm
+- QuerySet com todos os métodos
+- Pivot e tabelas temporárias
+- Introspecção de chaves estrangeiras
+- Cache de modelos e autocomplete
 
 ---
 

@@ -17,9 +17,16 @@ class lazy_property:
 
 class ModelMeta(type):
     def __new__(cls, name, bases, attrs):
-        fields = {k: v for k, v in attrs.items() if isinstance(v, Field)}
+        fields = {str(k): v for k, v in attrs.items() if isinstance(v, Field)}
         attrs["_fields"] = fields
         return super().__new__(cls, name, bases, attrs)
+
+    def __getattr__(cls, name):
+        queryset = cls._get_queryset()
+        if hasattr(queryset, name):
+            return getattr(queryset, name)
+        raise AttributeError(f"'{cls.__name__}' object has no attribute '{name}'")
+
 
 class Model(metaclass=ModelMeta):
     __tablename__ = None
@@ -31,7 +38,11 @@ class Model(metaclass=ModelMeta):
             setattr(self, field, kwargs.get(field))
 
     def to_dict(self):
-        return {k: getattr(self, k) for k in self._fields}
+        return {
+            k: getattr(self, k)
+            for k in self.__dict__
+            if not k.startswith("_") and not callable(getattr(self, k))
+        }
 
     def to_json(self):
         import json
@@ -48,8 +59,40 @@ class Model(metaclass=ModelMeta):
                     base[rel] = value.as_dict(deep=True)
         return base
 
-    def show(self):
-        print(tabulate([self.to_dict().values()], headers=self.to_dict().keys(), tablefmt="grid"))
+    @classmethod
+    def show(cls, limit=50, **filters):
+        from tabulate import tabulate
+        from colorama import Fore, Style
+
+        try:
+            qs = cls._get_queryset()
+            if filters:
+                qs = qs.filter(**filters)
+            else:
+                qs = qs.limit(limit)
+
+            results = qs.all()
+
+            if not results:
+                print("Nenhum resultado encontrado.")
+                return
+
+            headers = list(results[0].to_dict().keys())
+            rows = [list(obj.to_dict().values()) for obj in results]
+            tabela = tabulate(rows, headers=headers, tablefmt="grid")
+
+            cor = Fore.BLUE if getattr(cls, "_from_cache", False) else Fore.GREEN
+            linhas_coloridas = []
+            for linha in tabela.splitlines():
+                if linha.startswith("+") or set(linha) <= {"-", "=", "+"}:
+                    linhas_coloridas.append(f"{cor}{linha}{Style.RESET_ALL}")
+                else:
+                    linhas_coloridas.append(linha)
+
+            print("\n".join(linhas_coloridas))
+
+        except Exception as e:
+            print(f"❌ Erro ao mostrar dados: {e}")
 
     @classmethod
     def describe(cls, inline=False):
@@ -87,6 +130,21 @@ class Model(metaclass=ModelMeta):
         sql = f"CREATE TABLE {self.__tablename__} ({', '.join(parts)})"
         self._connection.execute(sql)
         cprint(f"✔ Tabela criada: {self.__tablename__}", "cyan")
+
+    def create_temp_table(self):
+        parts = []
+        for name, field in self._fields.items():
+            sql_type = "INT" if field.field_type == int else \
+                "FLOAT" if field.field_type == float else \
+                    "VARCHAR(255)"
+            nullable = "" if field.nullable else "NOT NULL"
+            primary = "PRIMARY KEY" if field.primary_key else ""
+            parts.append(f"{name} {sql_type} {nullable} {primary}".strip())
+
+        sql = f"CREATE TEMP TABLE {self.__tablename__} ({', '.join(parts)})"
+        self._connection.execute(sql)
+        from termcolor import cprint
+        cprint(f"🧪 Tabela temporária criada: {self.__tablename__}", "cyan")
 
     def add(self, confirm=False):
         if not confirm:
@@ -174,8 +232,8 @@ class Model(metaclass=ModelMeta):
         return cls._get_queryset().all()
 
     @classmethod
-    def filter(cls, **kwargs):
-        return cls._get_queryset().filter(**kwargs)
+    def filter(cls, *args, **kwargs):
+        return cls._get_queryset().filter(*args, **kwargs)
 
     @classmethod
     def filter_in(cls, column, values):
@@ -224,3 +282,48 @@ class Model(metaclass=ModelMeta):
     @classmethod
     def preload(cls, *relations):
         return cls._get_queryset().preload(*relations)
+
+    @classmethod
+    def pivot(cls, index, columns, values=None, aggfunc="count", filters=None, tablefmt="grid"):
+        qs = cls._get_queryset()
+        if filters:
+            qs = qs.filter(**filters)
+        records = qs.all()
+        return pivot(records, index, columns, values, aggfunc=aggfunc, tablefmt=tablefmt)
+
+    @classmethod
+    def __getattr__(cls, name):
+        queryset = cls._get_queryset()
+        if hasattr(queryset, name):
+            return getattr(queryset, name)
+        raise AttributeError(f"'{cls.__name__}' object has no attribute '{name}'")
+
+    @classmethod
+    def describe_relations(cls):
+        if not hasattr(cls, "_relations") or not cls._relations:
+            print(f"    '{cls.__name__}' não possui relações mapeadas.")
+            return
+        print(f"\n Relações para {cls.__name__}:")
+        for rel_name, target_table in cls._relations.items():
+            print(f"  - {rel_name} ➝ {target_table}")
+
+    @classmethod
+    def create_temp_table(cls):
+        parts = []
+        for name, field in cls._fields.items():
+            sql_type = (
+                "INT" if field.field_type == int else
+                "FLOAT" if field.field_type == float else
+                "VARCHAR(255)"
+            )
+            nullable = "" if field.nullable else "NOT NULL"
+            primary = "PRIMARY KEY" if field.primary_key else ""
+            parts.append(f"{name} {sql_type} {nullable} {primary}".strip())
+
+        sql = f"CREATE TEMP TABLE {cls.__tablename__} ({', '.join(parts)})"
+        cls._connection.execute(sql)
+
+        from termcolor import cprint
+        cprint(f"🧪 Tabela temporária criada: {cls.__tablename__}", "cyan")
+
+
