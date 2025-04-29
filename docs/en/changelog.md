@@ -1,3 +1,92 @@
+Aqui está a tradução fiel e natural para o inglês do seu changelog:  
+
+---
+
+## 📝 **Changelog – April 2025 Updates**
+
+---
+
+### 🔥 **QuerySet.py — New Enhancements and Methods**
+
+#### 🧠 Improvements to Existing Functions
+- `join(...)` now supports special types like `LEFT ANTI` and `RIGHT ANTI`.
+- Supports both positional and named JOIN type arguments.
+- `filter(...)` now accepts free expressions, lists, and dictionaries.
+- `filter_in(...)` and `not_in(...)` improved to support multiple formats.
+- `order_by()`, `group_by()`, and `select()` refined for greater flexibility without forcing prefixes.
+
+#### 🆕 New Methods in QuerySet
+- `limit()`, `offset()`, `distinct()`, `having()`, `live()`, `count()`, `first()`
+- `show()` — Displays results with automatic pagination.
+- `pivot()` — Generates dynamic pivot tables directly.
+- `create_temp_table()` — Creates temporary tables directly from a query.
+
+---
+
+### 📦 **ResultSet.py — Visual Improvements**
+
+- Terminal tables with color indicators:
+  - 🔵 Blue: cache results.
+  - 🟢 Green: live results.
+- Automatic pagination in `show(page_size=50)`.
+
+---
+
+### 🛠️ **Model.py — New Operations and Enhancements**
+
+#### 📋 Data Handling
+- `to_dict()`, `to_json()`, `as_dict(deep=True)`.
+
+#### 🔧 Validation and Hooks
+- `validate()`, `before_add()`, `after_update()`.
+
+#### 🗑️ CRUD Operations
+- `add(confirm=True)`, `update(confirm=True)`, `delete(confirm=True)`, `bulk_add(confirm=True)`.
+
+---
+
+### 📚 **ModelMeta.py — Method Interception**
+
+- `QuerySet` methods can now be called directly from the `Model` class.
+- Example: `User.filter(active=True).limit(10).show()`.
+
+---
+
+### 📈 **Expressions.py — Enhancements**
+
+- `col()`, `date()`, `now()`, and `raw()` improved.
+- Expanded documentation and practical examples.
+
+---
+
+### 📄 **Extended Documentation**
+
+- All methods now include clear docstrings and usage examples.
+- New JOIN types explained.
+
+---
+
+### 🎯 **Summary of New Features**
+
+| Feature | Description |
+|:--------|:------------|
+| ANTI JOINs supported | `left_anti`, `right_anti` |
+| Smarter filters | Improved `filter`, `filter_in`, `not_in` |
+| Direct pivot from queryset | `.pivot()` |
+| Temporary table creation | `.create_temp_table()` |
+| Required confirmation for operations | `confirm=True` for add/update/delete |
+| Colored and paginated result views | Enhanced UX with `show()` |
+| Full autocomplete support | Updated `.pyi` file for all models |
+
+---
+
+## ✅ **Guaranteed Backward Compatibility**
+
+All enhancements are 100% compatible with previous versions.
+
+---
+
+
 ## 📝 **Changelog – New Modules and Features**
 
 ---

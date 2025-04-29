@@ -1,3 +1,87 @@
+## 📝 **Changelog – Atualizações de Abril 2025**
+
+---
+
+### 🔥 **QuerySet.py — Novas Melhorias e Métodos**
+
+#### 🧠 Melhorias nas Funções Existentes
+- `join(...)` agora suporta tipos especiais como `LEFT ANTI` e `RIGHT ANTI`.
+- Aceita tipo de JOIN tanto posicional quanto nomeado.
+- `filter(...)` aceita expressões livres, listas e dicionários.
+- `filter_in(...)` e `not_in(...)` melhorados para múltiplos formatos.
+- `order_by()`, `group_by()`, `select()` refinados para melhor flexibilidade sem impor prefixos.
+
+#### 🆕 Novos métodos no QuerySet
+- `limit()`, `offset()`, `distinct()`, `having()`, `live()`, `count()`, `first()`
+- `show()` — Exibe resultados com paginação automática.
+- `pivot()` — Geração de tabelas dinâmicas diretamente.
+- `create_temp_table()` — Criação de tabelas temporárias diretamente de uma query.
+
+---
+
+### 📦 **ResultSet.py — Melhorias Visuais**
+
+- Tabelas com cores no terminal:
+  - 🔵 Azul: resultados de cache.
+  - 🟢 Verde: resultados live.
+- Paginador automático no `show(page_size=50)`.
+
+---
+
+### 🛠️ **Model.py — Novas Operações e Melhorias**
+
+#### 📋 Manipulação de Dados
+- `to_dict()`, `to_json()`, `as_dict(deep=True)`.
+
+#### 🔧 Validação e Hooks
+- `validate()`, `before_add()`, `after_update()`.
+
+#### 🗑️ Operações CRUD
+- `add(confirm=True)`, `update(confirm=True)`, `delete(confirm=True)`, `bulk_add(confirm=True)`.
+
+---
+
+### 📚 **ModelMeta.py — Interceptação de Métodos**
+
+- Métodos de `QuerySet` agora podem ser chamados diretamente da classe `Model`.
+- Exemplo: `User.filter(active=True).limit(10).show()`.
+
+---
+
+### 📈 **Expressions.py — Melhorias**
+
+- `col()`, `date()`, `now()`, `raw()` refinados.
+- Documentação ampliada e exemplos práticos.
+
+---
+
+### 📄 **Documentação Estendida**
+
+- Todos os métodos possuem docstrings e exemplos claros.
+- Novos tipos de JOINs explicados.
+
+---
+
+### 🎯 **Resumo das Novidades**
+
+| Novidade | Descrição |
+|:---------|:----------|
+| JOINs ANTI suportados | `left_anti`, `right_anti` |
+| Filtros inteligentes | `filter`, `filter_in`, `not_in` refinados |
+| Pivot direto de queryset | `.pivot()` |
+| Criação de tabelas temporárias | `.create_temp_table()` |
+| Segurança obrigatória | `confirm=True` em add/update/delete |
+| Visualização colorida e paginada | `show()` com UX melhorado |
+| Autocomplete completo | `.pyi` atualizado com todos os modelos |
+
+---
+
+## ✅ **Retrocompatibilidade Garantida**
+
+Todas as melhorias são 100% compatíveis com versões anteriores.
+
+---
+
 
 ## 📝 **Changelog – Novos Módulos e Funcionalidades**
 

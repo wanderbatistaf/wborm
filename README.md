@@ -1,25 +1,29 @@
 [![PyPI](https://img.shields.io/pypi/v/wborm)](https://pypi.org/project/wborm/) [![PyPI - Downloads](https://img.shields.io/pypi/dm/wborm)](https://pypi.org/project/wborm/) [![Build Status](https://github.com/wanderbatistaf/wborm/actions/workflows/publish-package.yml/badge.svg)](https://github.com/wanderbatistaf/wborm/actions) ![License: MIT](https://img.shields.io/github/license/wanderbatistaf/wborm) [![Último Commit](https://img.shields.io/github/last-commit/wanderbatistaf/wborm)](https://github.com/wanderbatistaf/wborm) [![GitHub issues](https://img.shields.io/github/issues/wanderbatistaf/wborm)](https://github.com/wanderbatistaf/wborm/issues) [![GitHub forks](https://img.shields.io/github/forks/wanderbatistaf/wborm?style=social)](https://github.com/wanderbatistaf/wborm) [![GitHub stars](https://img.shields.io/github/stars/wanderbatistaf/wborm?style=social)](https://github.com/wanderbatistaf/wborm) 
+
 # WBORM
 
-**WBORM** é uma biblioteca ORM leve para Python, projetada para funcionar diretamente com bancos de dados legados via JDBC, como Informix, DB2, Oracle e outros. Com foco em transparência, segurança e introspecção automática, ela é a parceira ideal da `wbjdbc`, entregando produtividade sem esconder o SQL.
+**WBORM** é uma biblioteca ORM leve para Python, projetada para trabalhar com bancos de dados legados via JDBC (Informix, DB2, Oracle, entre outros).  
+Com foco em transparência, segurança e geração automática de modelos, é a parceira ideal da `wbjdbc` para entregar produtividade sem esconder o SQL.
 
 ---
 
 ## ✨ Destaques
 
-- Suporte completo a conexões JDBC via `wbjdbc`
+- Conexão direta via JDBC usando `wbjdbc`
 - Geração automática de modelos com introspecção
-- API fluente com `.select()`, `.filter()`, `.join()` e mais
-- Pivot e visualização tabular com bordas coloridas
+- API fluente: `.select()`, `.filter()`, `.join()`, `.group_by()`, `.order_by()`
+- Novos JOINs avançados: `LEFT ANTI`, `RIGHT ANTI`
+- Pivot dinâmico diretamente do queryset com `.pivot()`
 - Criação de tabelas temporárias com `.create_temp_table()`
-- Confirmação obrigatória em operações destrutivas
-- Bloqueio de UPDATE/DELETE sem WHERE
-- Transações automáticas com rollback
-- Cache de resultados com TTL e bypass com `.live()`
-- Integração com Pandas e Spark
-- Hooks como `before_add()` e `after_update()`
-- Criptografia e cache de modelos com `model_cache`
-- Stub `.pyi` automático para autocomplete
+- Visualização de resultados com paginação e cores no terminal
+- Filtros flexíveis: strings, expressões, listas, dicionários
+- Operações CRUD com segurança: `confirm=True` obrigatório
+- Cache de consultas automático, com bypass por `.live()`
+- Integração direta com Pandas e Spark
+- Criptografia e persistência de modelos em cache local (`.wbmodels/`)
+- Autocomplete melhorado via stub `.pyi` gerado automaticamente
+- Suporte a expressões SQL dinâmicas: `col()`, `now()`, `date()`, `raw()`
+- Totalmente retrocompatível com versões anteriores
 
 ---
 
@@ -54,69 +58,55 @@ conn = connect_to_db(
 ```python
 from wborm.utils import generate_model, generate_all_models
 
-# Modelo único:
+# Gerar um modelo
 generate_model("clientes", conn)
 
-# Todos os modelos:
+# Gerar todos os modelos
 generate_all_models(conn)
 ```
 
-> Os modelos são injetados automaticamente no escopo global com o nome da tabela, ex: `clientes`.
+> Modelos são automaticamente injetados no escopo global com o nome da tabela.
 
-### 3. Consultando dados
+---
+
+## 📊 Consultando dados de forma fluente
 
 ```python
-clientes.select("nome").filter("idade > 30").order_by("nome").limit(5).show()
+clientes \
+    .select("nome", "idade") \
+    .filter("idade > 18") \
+    .order_by("nome") \
+    .limit(10) \
+    .show()
 ```
 
 ---
 
-## 🛠️ Definindo modelos manualmente (opcional)
+## 📈 Criando pivôs e tabelas temporárias
 
 ```python
-from wborm.core import Model
-from wborm.fields import Field
+# Pivot
+clientes.pivot(index="cidade", columns="sexo", values=["idade"])
 
-class Cliente(Model):
-    __tablename__ = "clientes"
-    id = Field(int, primary_key=True)
-    nome = Field(str)
-    idade = Field(int)
-
-Cliente._connection = conn
+# Tabela temporária
+top10 = clientes.filter("idade > 30").limit(10).create_temp_table("tmp_top10")
+top10.show()
 ```
-
-> Ideal para customizações, uso com `.create_table()` ou definir campos antes da criação no banco.
 
 ---
 
 ## 🔒 Segurança embutida
 
-- `.add()`, `.update()` e `.delete()` exigem `confirm=True`
-- Bloqueio automático de UPDATE ou DELETE sem cláusula WHERE
-- Transações protegidas com `BEGIN WORK / COMMIT / ROLLBACK`
+- Operações `.add()`, `.update()`, `.delete()` exigem `confirm=True`.
+- UPDATE ou DELETE sem WHERE são bloqueados automaticamente.
+- Transações protegidas com `BEGIN WORK / COMMIT / ROLLBACK` automático.
 
 ---
 
-## 📊 Integração com Pandas e Spark
+## 📦 Cache inteligente
 
-```python
-import pandas as pd
-
-clientes = clientes.all()
-df = pd.DataFrame([c.to_dict() for c in clientes])
-```
-
-```python
-spark.createDataFrame([c.to_dict() for c in clientes.all()])
-```
-
----
-
-## 📦 Cache e performance
-
-- Consultas são cacheadas automaticamente (`TTL = 60s` por padrão)
-- Use `.live()` para forçar leitura ao vivo:
+- Consultas armazenadas automaticamente por 60 segundos.
+- Forçar leitura ao vivo com `.live()`:
 
 ```python
 clientes.live().filter(ativo=True).all()
@@ -124,31 +114,26 @@ clientes.live().filter(ativo=True).all()
 
 ---
 
-## 📌 Cores no terminal
+## 🎨 Visualização com cores no terminal
 
-### Logs (via `termcolor`)
-- ✅ Verde: inserções (`add`, `bulk_add`)
-- 🟡 Amarelo: atualizações (`update`)
-- ❌ Vermelho: erros ou exclusões (`delete`)
-- 🔵 Azul / 🔷 Ciano: mensagens informativas e tabelas de cache
-
-### Tabelas renderizadas com `show()` ou `pivot()`
-- Modelos criados dinamicamente: bordas **verdes**
-- Modelos carregados via cache: bordas **azuis**
+- Tabelas dinâmicas coloridas:
+  - 🔵 Azul para resultados do cache.
+  - 🟢 Verde para consultas ao vivo.
+- Paginação automática para grandes volumes de dados.
 
 ---
 
-## 📖 Documentação completa
+## 📚 Documentação Completa
 
 Acesse:
 [https://wanderbatistaf.github.io/wborm](https://wanderbatistaf.github.io/wborm)
 
 Inclui:
 - Guia de Início Rápido
-- QuerySet com todos os métodos
-- Pivot e tabelas temporárias
-- Introspecção de chaves estrangeiras
-- Cache de modelos e autocomplete
+- API completa do QuerySet
+- Uso de Pivot e Tabelas Temporárias
+- Geração automática de modelos
+- Cache local e stub de autocomplete
 
 ---
 
@@ -160,5 +145,5 @@ Este projeto é licenciado sob a Licença MIT. Consulte o arquivo LICENSE para m
 
 ## 🤝 Contribuindo
 
-Pull requests são bem-vindos! Envie sugestões ou melhorias diretamente no [repositório do GitHub](https://github.com/wanderbatistaf/wborm).
-
+Pull requests são bem-vindos!  
+Sugestões e melhorias podem ser enviadas diretamente no [repositório do GitHub](https://github.com/wanderbatistaf/wborm).

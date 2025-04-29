@@ -1,4 +1,5 @@
 from datetime import datetime
+import re
 
 class Expression:
     def __init__(self, sql):
@@ -27,15 +28,59 @@ class Expression:
 
 
 def col(name):
+    """
+        Representa uma coluna como expressão utilizável em filtros.
+
+        Forma de uso:
+        -------------
+        queryset.filter(col("status") == "ATIVO")
+
+        Gera cláusulas como:
+        --------------------
+        WHERE status = 'ATIVO'
+        """
     return Expression(name)
 
 def date(field):
+    """
+        Converte um campo para o tipo DATE na cláusula SQL.
+
+        Forma de uso:
+        -------------
+        queryset.filter(date("data_criacao") >= "2024-01-01")
+
+        Gera cláusulas como:
+        --------------------
+        WHERE DATE(data_criacao) >= '2024-01-01'
+        """
     return Expression(f"DATE({field})")
 
 def raw(expr):
+    """
+        Insere uma expressão SQL bruta no filtro ou seleção.
+
+        Forma de uso:
+        -------------
+        queryset.select(raw("COUNT(*) AS total"))
+
+        Gera cláusulas como:
+        --------------------
+        SELECT COUNT(*) AS total
+        """
     return Expression(expr)
 
 def now():
+    """
+        Representa a data/hora atual do banco de dados.
+
+        Forma de uso:
+        -------------
+        queryset.filter(date("data_atualizacao") >= now())
+
+        Gera cláusulas como:
+        --------------------
+        WHERE DATE(data_atualizacao) >= CURRENT
+        """
     return Expression("CURRENT")
 
 from datetime import datetime
@@ -44,18 +89,19 @@ def format_informix_datetime(value):
     from datetime import datetime
 
     if isinstance(value, datetime):
-        sql_val = f"DATETIME({value.strftime('%Y-%m-%d %H:%M:%S')}) YEAR TO SECOND"
-    elif isinstance(value, str):
+        return f"DATETIME({value.strftime('%Y-%m-%d %H:%M:%S')}) YEAR TO SECOND"
+    if isinstance(value, str):
+        if re.match(r"^t\d+\.\w+$", value):  # trata como coluna válida
+            return value
         try:
             dt = datetime.fromisoformat(value)
-            sql_val = f"DATETIME({dt.strftime('%Y-%m-%d %H:%M:%S')}) YEAR TO SECOND"
+            if dt.time() == datetime.min.time():
+                return f"'{dt.date().isoformat()}'"
+            return f"DATETIME({dt.strftime('%Y-%m-%d %H:%M:%S')}) YEAR TO SECOND"
         except ValueError:
-            sql_val = f"'{value}'"  # fallback se for uma string literal
-    else:
-        sql_val = str(value)
+            return f"'{value}'"
+    return str(value)
 
-    # print(f"📦 format_informix_datetime → {sql_val}")
-    return sql_val
 
 
 
