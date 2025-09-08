@@ -72,7 +72,10 @@ class QuerySet:
                     self._filters.append(f"{k} = '{escaped}'")
         for k, v in kwargs.items():
             escaped = str(v).replace("'", "''")
-            self._filters.append(f"{k} = '{escaped}'")
+            if hasattr(self, '_table_alias') and '.' not in k:
+                self._filters.append(f"{self._table_alias}.{k} = '{escaped}'")
+            else:
+                self._filters.append(f"{k} = '{escaped}'")
         return self
 
     def filter_in(self, *args):
@@ -121,7 +124,10 @@ class QuerySet:
             -------------------
             WHERE status NOT IN ('CANCELADO', 'REJEITADO')
             """
-        self._not_in_filters.append((column, values))
+        if isinstance(values, str) and values.strip().upper().startswith("SELECT"):
+            self._not_in_filters.append((column, values, True))  # flag subquery
+        else:
+            self._not_in_filters.append((column, values, False))
         return self
 
     def join(self, other, on, *args, type=None):
@@ -405,7 +411,7 @@ class QuerySet:
 
             selected = ", ".join(selected_parts)
 
-        sql = f"SELECT {skip_first}{prefix}{selected} FROM {self.model.__tablename__} AS {self._table_alias}"
+        sql = f"SELECT {skip_first}{prefix}{selected} FROM {self.model.__tablename__} {self._table_alias}"
 
         for join_type, join_table, condition in self._joins:
             sql += f" {join_type} JOIN {join_table} ON {condition}"
@@ -427,9 +433,12 @@ class QuerySet:
                 lista = ", ".join(f"'{v}'" for v in vals)
                 conditions.append(f"{col} IN ({lista})")
         if self._not_in_filters:
-            for col, vals in self._not_in_filters:
-                lista = ", ".join(f"'{v}'" for v in vals)
-                conditions.append(f"{col} NOT IN ({lista})")
+            for col, vals, is_subquery in self._not_in_filters:
+                if is_subquery:
+                    conditions.append(f"{col} NOT IN ({vals})")
+                else:
+                    lista = ", ".join(f"'{v}'" for v in vals)
+                    conditions.append(f"{col} NOT IN ({lista})")
 
         if conditions:
             sql += " WHERE " + " AND ".join(conditions)
@@ -518,6 +527,54 @@ class QuerySet:
             sql += " WHERE " + " AND ".join(conditions)
         result = self.conn.execute_query(sql)
         return result[0]["count"] if result else 0
+
+    def max(self, column):
+        """
+        Retorna o valor máximo de uma coluna.
+
+        Exemplo:
+        --------
+        ultimo = Model.filter(status="ATIVO").max("data_criacao")
+        """
+        sql = f"SELECT MAX({column}) as max_value FROM {self.model.__tablename__}"
+
+        if self._filters:
+            sql += " WHERE " + " AND ".join(self._filters)
+
+        result = self.conn.execute_query(sql)
+        return result[0]["max_value"] if result else None
+
+    def min(self, column):
+        """
+        Retorna o valor mínimo de uma coluna.
+
+        Exemplo:
+        --------
+        primeiro = Model.filter(status="ATIVO").min("data_criacao")
+        """
+        sql = f"SELECT MIN({column}) as min_value FROM {self.model.__tablename__}"
+
+        if self._filters:
+            sql += " WHERE " + " AND ".join(self._filters)
+
+        result = self.conn.execute_query(sql)
+        return result[0]["min_value"] if result else None
+
+    def sum(self, column):
+        """
+        Retorna a soma dos valores de uma coluna.
+
+        Exemplo:
+        --------
+        total = Model.filter(status="ATIVO").sum("valor")
+        """
+        sql = f"SELECT SUM({column}) as sum_value FROM {self.model.__tablename__}"
+
+        if self._filters:
+            sql += " WHERE " + " AND ".join(self._filters)
+
+        result = self.conn.execute_query(sql)
+        return result[0]["sum_value"] if result else None
 
     def show(self, tablefmt="grid"):
         """
@@ -639,14 +696,69 @@ class QuerySet:
             """
         sql = self._build_query()
         log_clause = "WITH LOG" if with_log else "WITH NO LOG"
-        create_sql = f"CREATE TEMP TABLE {temp_name} AS ({sql}) {log_clause}"
+        create_sql = f"{sql} INTO TEMP {temp_name} {log_clause}"
 
-        print(f" Criando tabela temporária:\n{create_sql}")
-        self.conn.execute(create_sql)
+        print(f"Criando tabela temporária:\n{create_sql}")
+        self.conn.execute_query(create_sql)
+
+        # Sempre retorna o Model, mesmo se estiver vazia
+        from wborm.utils import generate_model
+        return generate_model(temp_name, self.conn, inject_globals=True)
+
+    def create_empty_temp_table(self, temp_name, columns, with_log=False):
+        """
+        Cria uma tabela temporária vazia com schema explícito.
+
+        Exemplo:
+            qs.create_empty_temp_table(
+                "tmp_01",
+                [
+                    ("mach_cd", "VARCHAR(20)"),
+                    ("back_load", "VARCHAR(20)"),
+                    ("wgt_cons", "DECIMAL(18,2)")
+                ],
+                with_log=False
+            )
+        """
+        log_clause = "WITH LOG" if with_log else "WITH NO LOG"
+        cols = ",\n    ".join([f"{name} {dtype}" for name, dtype in columns])
+
+        create_sql = f"""
+                    CREATE TEMP TABLE {temp_name} (
+                        {cols}
+                    ) {log_clause}
+                """
+        print(f"Criando tabela temporária vazia:\n{create_sql}")
+        self.conn.execute_query(create_sql)
 
         from wborm.utils import generate_model
         model = generate_model(temp_name, self.conn, inject_globals=True)
+
+        # Fallback: garante que _fields exista mesmo sem linhas
+        if not getattr(model, "_fields", None):
+            model._fields = [name for name, _ in columns]
+
         return model
+
+
+    def insert_into(self, table_name, columns=None):
+        """
+        Insere o resultado da query atual na tabela informada.
+
+        Exemplo:
+            qs.select("... AS c1", "... AS c2").insert_into("tmp_tab", columns=["c1","c2"])
+        """
+        sql = self._build_query()
+        if not sql:
+            # nada pra inserir → apenas retorna, não quebra
+            return self
+        if columns:
+            cols = ", ".join(columns)
+            insert_sql = f"INSERT INTO {table_name} ({cols}) {sql}"
+        else:
+            insert_sql = f"INSERT INTO {table_name} {sql}"
+        self.conn.execute_query(insert_sql)
+        return self
 
 class ResultSet(list):
     def __init__(self, data=None, selected_fields=None):

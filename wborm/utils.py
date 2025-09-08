@@ -161,6 +161,16 @@ def generate_model(table_name, conn, refresh=False, inject_globals=True, target_
     _model_registry[table_name] = model_class
     generate_model_stub()
 
+    @classmethod
+    def objects(cls, conn):
+        from wborm.query import QuerySet
+        return QuerySet(cls, conn)
+
+    model_class.objects = objects
+
+    if not getattr(model_class, "_fields", None):
+        model_class._fields = [col["name"] for col in metadata] if metadata else []
+
     return model_class
 
 def get_model(table_name, conn):
