@@ -22,3 +22,12 @@ Bem-vindo à documentação da `wborm`, uma biblioteca ORM leve e expressiva, cr
 ```bash
 pip install wborm
 ```
+
+## Guias Recomendados
+
+- [Integracao com WBJDBC](integra-wbjdbc.md)
+- [Integracao com Informix](informix_integration.md)
+- [Guia de Producao com FastAPI](fastapi_production_guide.md)
+- [Configuracao de cache](cache_configuration.md)
+- [Conexao global](global_connection_guide.md)
+- [Suporte multi-database](multi_database_support.md)

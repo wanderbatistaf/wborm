@@ -1,55 +1,72 @@
-import sys, os
-import time
+import sys
+import os
 from wborm.fields import Field
 from wborm.core import Model
 from wborm.introspect import introspect_table, get_foreign_keys
-from wborm.model_cache import try_load_model_from_disk, save_model_to_disk, generate_model_stub, get_or_create_key
+from wborm.model_cache import try_load_model_from_disk, save_model_to_disk
+from wborm.stub_generator import generate_model_stub
+from wborm.type_mapper import map_coltype_to_python
+from wborm.file_utils import CACHE_DIR, list_cached_models
 from wborm.registry import _model_registry, _model_cache
-from cryptography.fernet import Fernet
-import pickle
+from wborm.connection_utils import execute_sql
 
-def map_coltype_to_python(coltype):
+
+def get_global_connection():
     """
-    Mapeia o tipo da coluna (int ou string) para um tipo Python.
-    - Se receber um int (tipo Informix original), usa o bitmask.
-    - Se receber uma string (como 'VARCHAR'), faz o mapeamento direto.
+    Retorna a conexão global registrada.
+
+    Forma de uso:
+    -------------
+    conn = get_global_connection()
+
+    Retorna:
+    --------
+    Connection : Conexão registrada com register_global_connection()
+
+    Exceções:
+    ---------
+    RuntimeError: Se nenhuma conexão global foi registrada
+
+    Exemplo:
+    --------
+    from wborm import register_global_connection, get_global_connection
+
+    # Registrar uma vez
+    register_global_connection(conn)
+
+    # Acessar em qualquer lugar
+    conn = get_global_connection()
     """
-    if isinstance(coltype, int):
-        type_code = coltype & 0xFF
-        if type_code in (0, 5):  # CHAR, DECIMAL
-            return int
-        if type_code in (1, 13):  # SMALLINT, VARCHAR
-            return str
-        if type_code in (2, 3):  # INTEGER, FLOAT
-            return float
-        return str
-    else:
-        type_str = str(coltype).upper()
-        if type_str in ("SMALLINT", "INTEGER", "INT8", "SERIAL", "SERIAL8"):
-            return int
-        if type_str in ("FLOAT", "SMALLFLOAT", "REAL", "DECIMAL", "MONEY"):
-            return float
-        if type_str in ("DATE", "DATETIME"):
-            return str
-        if type_str in ("BOOLEAN",):
-            return bool
-        return str
+    from wborm.registry import _connection
+    if _connection is None:
+        raise RuntimeError(
+            "Nenhuma conexão global registrada.\n"
+            "Use: register_global_connection(conn) primeiro."
+        )
+    return _connection
 
 
-def generate_model(table_name, conn, refresh=False, inject_globals=True, target_globals=None):
+def generate_model(table_name, conn=None, refresh=False, inject_globals=True, target_globals=None):
     """
         Gera dinamicamente uma classe de modelo Python com base na estrutura de uma tabela do banco de dados.
 
         Forma de uso:
         -------------
+        # Com conexão explícita
         generate_model("clientes", conn)
+
+        # Com conexão global (mais conveniente)
+        register_global_connection(conn)  # fazer uma vez
+        generate_model("clientes")  # usar em qualquer lugar
 
         Parâmetros:
         ------------
         table_name : str
             Nome da tabela a ser introspectada e transformada em modelo.
-        conn : object
-            Conexão ativa com o banco de dados.
+        conn : object, opcional
+            Conexão ativa com o banco de dados. Se não fornecida, usa a conexão global
+            registrada com `register_global_connection()`.
+            (padrão: None - usa conexão global)
         refresh : bool, opcional
             Se True, força a introspecção da tabela mesmo se existir cache ou modelo salvo em disco.
             (padrão: False)
@@ -61,6 +78,7 @@ def generate_model(table_name, conn, refresh=False, inject_globals=True, target_
 
         Comportamento:
         --------------
+        - Se `conn` não for fornecido, busca a conexão global do registry.
         - Se o modelo já existir no cache, apenas reutiliza.
         - Se houver modelo salvo no disco, carrega para evitar reintrospecção.
         - Se não existir, introspecta a estrutura da tabela e gera dinamicamente:
@@ -71,7 +89,15 @@ def generate_model(table_name, conn, refresh=False, inject_globals=True, target_
 
         Exemplo de uso rápido:
         ----------------------
+        # Método 1: Conexão explícita (tradicional)
         Cliente = generate_model("clientes", conn)
+
+        # Método 2: Conexão global (recomendado)
+        from wborm import register_global_connection, generate_model
+        register_global_connection(conn)
+        Cliente = generate_model("clientes")
+        Pedido = generate_model("pedidos")
+
         clientes = Cliente.filter(status="ATIVO").all()
 
         Observações:
@@ -80,9 +106,24 @@ def generate_model(table_name, conn, refresh=False, inject_globals=True, target_
         - Se ocorrer erro ao ler FKs, prossegue apenas com os campos normais.
         - Chama `save_model_to_disk()` para persistir o modelo localmente.
         - Atualiza o registro `_model_registry` para permitir joins automáticos.
+
+        Exceções:
+        ---------
+        RuntimeError: Se `conn` não for fornecido e não houver conexão global registrada.
         """
     import sys
     import inspect
+
+    # Se conn não foi fornecido, usa a conexão global
+    if conn is None:
+        from wborm.registry import _connection
+        if _connection is None:
+            raise RuntimeError(
+                "Nenhuma conexão fornecida e nenhuma conexão global registrada.\n"
+                "Use: register_global_connection(conn) ou passe conn explicitamente."
+            )
+        conn = _connection
+
     key = (table_name, id(conn))
 
     if not refresh and key in _model_cache:
@@ -102,16 +143,33 @@ def generate_model(table_name, conn, refresh=False, inject_globals=True, target_
             return model
 
     metadata = introspect_table(table_name, conn)
-    class_attrs = {"__tablename__": table_name}
+    class_attrs = {"__tablename__": table_name, "_relation_configs": {}}
 
     for col in metadata:
         py_type = map_coltype_to_python(col["type"])
-        class_attrs[str(col["name"])] = Field(py_type)
+        is_pk = str(col["name"]).lower() == "id" or bool(col.get("primary_key"))
+        raw_length = col.get("length")
+        max_length = None
+        if py_type is str and raw_length:
+            try:
+                max_length = int(raw_length)
+            except (TypeError, ValueError):
+                max_length = None
+        class_attrs[str(col["name"])] = Field(
+            py_type,
+            primary_key=is_pk,
+            column_name=str(col["name"]),
+            max_length=max_length,
+        )
 
     class_name = table_name.capitalize()
     class_attrs["__module__"] = "wborm.core"
     model_class = type(class_name, (Model,), class_attrs)
     model_class._connection = conn
+
+    # Detect and set database dialect
+    from wborm.dialects import detect_dialect
+    model_class._dialect = detect_dialect(conn)
 
     sys.modules["wborm.core"].__dict__[class_name] = model_class
 
@@ -125,19 +183,35 @@ def generate_model(table_name, conn, refresh=False, inject_globals=True, target_
 
             if from_tbl == table_name:
                 rel_name = from_col.replace("_id", "")
-                def relation_getter(self, t=to_tbl, fk_col=from_col, pk_col=to_col):
+                def relation_getter(self, t=to_tbl, fk_col=from_col, pk_col=to_col, relation_name=rel_name):
+                    if relation_name in self.__dict__:
+                        return self.__dict__[relation_name]
                     Target = generate_model(t, conn, target_globals=target_globals)
                     return Target.filter(**{pk_col: getattr(self, fk_col)}).first()
                 setattr(model_class, rel_name, property(relation_getter))
                 model_class._relations[rel_name] = to_tbl
+                model_class._relation_configs[rel_name] = {
+                    "kind": "belongs_to",
+                    "model": to_tbl,
+                    "local_key": from_col,
+                    "remote_key": to_col,
+                }
 
             if to_tbl == table_name:
                 reverse_name = from_tbl.lower() + "s"
-                def reverse_getter(self, t=from_tbl, fk_col=from_col, pk_col=to_col):
+                def reverse_getter(self, t=from_tbl, fk_col=from_col, pk_col=to_col, relation_name=reverse_name):
+                    if relation_name in self.__dict__:
+                        return self.__dict__[relation_name]
                     Source = generate_model(t, conn, target_globals=target_globals)
                     return Source.filter(**{fk_col: getattr(self, pk_col)}).all()
                 setattr(model_class, reverse_name, property(reverse_getter))
                 model_class._relations[reverse_name] = from_tbl
+                model_class._relation_configs[reverse_name] = {
+                    "kind": "has_many",
+                    "model": from_tbl,
+                    "local_key": to_col,
+                    "remote_key": from_col,
+                }
     except Exception as e:
         print(f"     ⚠️ Ignorando FKs para '{table_name}': {e}")
 
@@ -173,31 +247,100 @@ def generate_model(table_name, conn, refresh=False, inject_globals=True, target_
 
     return model_class
 
-def get_model(table_name, conn):
+def get_model(table_name, conn=None):
+    """
+    Retorna a classe de modelo associada à tabela especificada.
+
+    Forma de uso:
+    -------------
+    # Com conexão explícita
+    Cliente = get_model("clientes", conn)
+
+    # Com conexão global
+    register_global_connection(conn)
+    Cliente = get_model("clientes")
+
+    Parâmetros:
+    -----------
+    table_name : str
+        Nome da tabela
+    conn : object, opcional
+        Conexão com o banco. Se não fornecida, usa a conexão global.
+
+    Comportamento:
+    --------------
+    - Se o modelo já existir no cache ou salvo em disco, reutiliza.
+    - Caso contrário, gera dinamicamente usando `generate_model`.
+
+    Observações:
+    ------------
+    - É um atalho para `generate_model(table_name, conn)`.
+    """
     return generate_model(table_name, conn)
 
-def generate_all_models(conn, include_views=False, inject_globals=True, target_globals=None, verbose=True):
+def generate_all_models(conn=None, include_views=False, inject_globals=True, target_globals=None, verbose=True):
     """
-        Retorna a classe de modelo associada à tabela especificada.
+    Gera modelos para todas as tabelas do banco de dados.
 
-        Forma de uso:
-        -------------
-        Cliente = get_model("clientes", conn)
+    Forma de uso:
+    -------------
+    # Com conexão explícita
+    models = generate_all_models(conn)
 
-        Comportamento:
-        --------------
-        - Se o modelo já existir no cache ou salvo em disco, reutiliza.
-        - Caso contrário, gera dinamicamente usando `generate_model`.
+    # Com conexão global
+    register_global_connection(conn)
+    models = generate_all_models()
 
-        Observações:
-        ------------
-        - É apenas um atalho para `generate_model(table_name, conn)`.
-        """
+    Parâmetros:
+    -----------
+    conn : object, opcional
+        Conexão com o banco. Se não fornecida, usa a conexão global.
+    include_views : bool, opcional
+        Se True, inclui views além de tabelas (padrão: False)
+    inject_globals : bool, opcional
+        Se True, injeta modelos no escopo global (padrão: True)
+    target_globals : dict, opcional
+        Escopo alternativo para injeção
+    verbose : bool, opcional
+        Se True, exibe barra de progresso (padrão: True)
+
+    Retorna:
+    --------
+    dict : Dicionário {table_name: ModelClass}
+
+    Comportamento:
+    --------------
+    - Lista todas as tabelas do banco (systables para Informix)
+    - Gera modelo para cada tabela encontrada
+    - Exibe barra de progresso se verbose=True
+    - Registra modelos no _model_registry
+    - Gera arquivo de stubs para autocomplete
+
+    Observações:
+    ------------
+    - Pula tabelas do sistema (tabid <= 99 no Informix)
+    - Continua mesmo se falhar em alguma tabela
+    - Útil para carregar todo o esquema do banco de uma vez
+    """
     from wborm.utils import generate_model
-    from wborm.model_cache import generate_model_stub
+    from wborm.stub_generator import generate_model_stub
     from wborm.registry import _model_registry
-    from tqdm import tqdm  # barra de progresso
     import traceback
+
+    try:
+        from tqdm import tqdm  # barra de progresso
+    except ImportError:
+        tqdm = None
+
+    # Se conn não foi fornecido, usa a conexão global
+    if conn is None:
+        from wborm.registry import _connection
+        if _connection is None:
+            raise RuntimeError(
+                "Nenhuma conexão fornecida e nenhuma conexão global registrada.\n"
+                "Use: register_global_connection(conn) ou passe conn explicitamente."
+            )
+        conn = _connection
 
     if target_globals is None:
         target_globals = globals()
@@ -211,11 +354,12 @@ def generate_all_models(conn, include_views=False, inject_globals=True, target_g
         print(f"\n🔄 Gerando modelos para {total} tabelas...\n")
 
     models = {}
-    progress_bar = tqdm(results, desc="📦 Gerando modelos", unit="tabela", ncols=100)
+    progress_bar = tqdm(results, desc="📦 Gerando modelos", unit="tabela", ncols=100) if (verbose and tqdm) else results
 
     for row in progress_bar:
         table = str(row["tabname"])
-        progress_bar.set_postfix_str(table)
+        if verbose and tqdm:
+            progress_bar.set_postfix_str(table)
 
         try:
             model = generate_model(
@@ -226,7 +370,10 @@ def generate_all_models(conn, include_views=False, inject_globals=True, target_g
             )
             models[table] = model
         except Exception as e:
-            progress_bar.write(f"  ⚠️ Erro ao gerar modelo para '{table}': {e}")
+            if verbose and tqdm:
+                progress_bar.write(f"  ⚠️ Erro ao gerar modelo para '{table}': {e}")
+            else:
+                print(f"  ⚠️ Erro ao gerar modelo para '{table}': {e}")
 
     _model_registry.update(models)
     generate_model_stub()
@@ -270,30 +417,17 @@ def list_models(conn=None):
         for name in sorted(models):
             print(f" - {name}")
     else:
-        model_dir = ".wbmodels"
-        if not os.path.isdir(model_dir):
+        if not os.path.isdir(CACHE_DIR):
             print("⚠ Diretório de modelos não encontrado.")
             return
 
-        models = []
-        key = get_or_create_key()
-        for file in os.listdir(model_dir):
-            if file.endswith(".wbm"):
-                path = os.path.join(model_dir, file)
-                try:
-                    with open(path, "rb") as f:
-                        encrypted = f.read()
-                    data = Fernet(key).decrypt(encrypted)
-                    cached = pickle.loads(data)
-                    models.append(file.replace(".wbm", ""))
-                except Exception as e:
-                    print(f"⚠ Erro ao ler cache '{file}': {e}")
+        models = list_cached_models()
 
         if not models:
             print("⚠ Nenhum modelo válido no cache.")
         else:
-            print(f"\n Modelos encontrados em cache ({len(models)}):\n")
-            for name in sorted(models):
+            print(f"\n📦 Modelos encontrados em cache ({len(models)}):\n")
+            for name in models:
                 print(f" - {name}")
 
 def get_model_by_name(name):
@@ -352,7 +486,7 @@ def create_temp_table_from_queryset(queryset, temp_name, with_log=False):
     create_sql = f"CREATE TEMP TABLE {temp_name} AS ({sql}) {log_clause}"
 
     # print(f"📦 Criando temp table: {create_sql}")
-    queryset.conn.execute(create_sql)
+    execute_sql(queryset.conn, create_sql)
 
     from wborm.utils import generate_model
     return generate_model(temp_name, queryset.conn, inject_globals=True)

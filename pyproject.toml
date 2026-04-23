@@ -1,6 +1,6 @@
 [project]
 name = "wborm"
-version = "0.3.2"
+version = "0.4.0"
 description = "ORM leve com introspecção automática para bancos JDBC como Informix, usando integração com wbjdbc."
 readme = "README.md"
 authors = [
@@ -12,8 +12,8 @@ dependencies = [
   "wbjdbc>=1.1.3",
   "tabulate",
   "termcolor",
-  "pandas; extra == 'pandas'",
-  "pyspark; extra == 'spark'"
+  "cryptography",
+  "tqdm"
 ]
 keywords = ["ORM", "JDBC", "Informix", "DB2", "Firebird", "introspecção", "wbjdbc"]
 classifiers = [
@@ -21,6 +21,24 @@ classifiers = [
   "Intended Audience :: Developers",
   "Programming Language :: Python :: 3",
   "Operating System :: OS Independent"
+]
+
+[project.optional-dependencies]
+dev = [
+  "pytest>=7.0",
+  "pytest-cov>=4.0",
+  "black>=23.0",
+  "flake8>=6.0",
+  "mypy>=1.0",
+  "isort>=5.12"
+]
+pandas = ["pandas"]
+spark = ["pyspark"]
+api = ["fastapi>=0.110", "pydantic>=2.0"]
+docs = [
+  "mkdocs>=1.5",
+  "mkdocs-material>=9.5,<9.7",
+  "mkdocs-static-i18n>=1.2"
 ]
 
 [project.urls]
@@ -32,5 +50,5 @@ Repository = "https://github.com/wanderbatistaf/wborm"
 requires = ["setuptools>=61.0"]
 build-backend = "setuptools.build_meta"
 
-[tool.setuptools]
-packages = ["wborm"]
+[tool.setuptools.packages.find]
+include = ["wborm*"]

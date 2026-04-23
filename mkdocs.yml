@@ -6,6 +6,8 @@ site_url: https://wanderbatistaf.github.io/wborm/
 repo_name: wanderbatistaf/wborm
 repo_url: https://github.com/wanderbatistaf/wborm
 edit_uri: edit/main/docs/
+exclude_docs: |
+  README.md
 
 theme:
   name: material
@@ -32,7 +34,6 @@ extra_css:
 
 plugins:
   - i18n:
-      default_language: pt
       languages:
         - locale: pt
           name: Português
@@ -43,12 +44,23 @@ plugins:
           build: true
 
 nav:
-  - Início: index.md
-  - Modelos: modelos.md
-  - Exemplos: exemplos.md
-  - Integração wbjdbc: integra-wbjdbc.md
-  - Changelog: changelog.md
-  - Sobre: por-que-usar.md
+  - Inicio: index.md
+  - Fundamentos:
+      - Modelos: modelos.md
+      - Exemplos: exemplos.md
+      - Por que usar: por-que-usar.md
+  - Integracoes:
+      - WBJDBC: integra-wbjdbc.md
+      - Informix: informix_integration.md
+      - FastAPI em producao: fastapi_production_guide.md
+  - Recursos Avancados:
+      - Cache: cache_configuration.md
+      - Exemplos avancados: performance_examples.md
+      - Conexao global: global_connection_guide.md
+      - Multi-database: multi_database_support.md
+  - Projeto:
+      - Testes: testing.md
+      - Changelog: changelog.md
 
 markdown_extensions:
   - toc:

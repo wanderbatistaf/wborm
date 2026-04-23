@@ -1,12 +1,14 @@
 import time
-from tabulate import tabulate
-from wborm.registry import _query_result_cache
-from colorama import Fore, Style
 import os
 import tempfile
 import pickle
+import re
 from wborm.registry import _model_registry
-from hashlib import md5
+from wborm.cache_config import get_cache_config
+from wborm.compat import tabulate_data, terminal_colors
+from wborm.connection_utils import run_query
+from wborm.performance import get_monitor
+from hashlib import md5, sha256
 
 class _Alias:
     def __init__(self, alias): self.alias = alias
@@ -21,10 +23,12 @@ def _auto_inject_aliases():
 _auto_inject_aliases()  # Executa automaticamente no load do módulo
 
 class QuerySet:
-    def __init__(self, model, conn):
+    def __init__(self, model, conn, session=None):
         self.model = model
         self.conn = conn
+        self.session = session
         self._filters = []
+        self._filter_params = []
         self._in_filters = []
         self._not_in_filters = []
         self._limit = None
@@ -36,12 +40,53 @@ class QuerySet:
         self._having = None
         self._distinct = False
         self._raw_sql = None
+        self._raw_params = []
         self._preloads = []
-        self._cache_enabled = True
-        self._cache_ttl = 60
+        self._lock_clause = None
+
+        # Cache configuration - use global by default
+        self._cache_config = get_cache_config()
+        self._cache_enabled = None  # None = use global config
+        self._cache_ttl = None  # None = use global config
+
+        # Lazy loading configuration
+        self._only_fields = []  # Load only these fields
+        self._deferred_fields = []  # Don't load these fields
+
+        # Set operations
+        self._union_queries = []  # For UNION operations
+        self._union_all = False
 
         from wborm.bootstrap import auto_load_cached_models
         auto_load_cached_models(conn)
+
+    def _qualify_column(self, column):
+        if "." in column or not hasattr(self, "_table_alias"):
+            return column
+        return f"{self._table_alias}.{column}"
+
+    def _build_lookup_condition(self, key, value):
+        parts = key.rsplit("__", 1)
+        if len(parts) == 2 and parts[1] in {"gt", "gte", "lt", "lte", "ne", "like", "ilike", "contains", "startswith", "endswith"}:
+            column, lookup = parts
+        else:
+            column, lookup = key, "exact"
+
+        column = self._qualify_column(column)
+        lookup_map = {
+            "exact": (f"{column} = ?", [value]),
+            "gt": (f"{column} > ?", [value]),
+            "gte": (f"{column} >= ?", [value]),
+            "lt": (f"{column} < ?", [value]),
+            "lte": (f"{column} <= ?", [value]),
+            "ne": (f"{column} <> ?", [value]),
+            "like": (f"{column} LIKE ?", [value]),
+            "ilike": (f"UPPER({column}) LIKE UPPER(?)", [value]),
+            "contains": (f"{column} LIKE ?", [f"%{value}%"]),
+            "startswith": (f"{column} LIKE ?", [f"{value}%"]),
+            "endswith": (f"{column} LIKE ?", [f"%{value}"]),
+        }
+        return lookup_map[lookup]
 
     def filter(self, *args, **kwargs):
         """
@@ -68,14 +113,13 @@ class QuerySet:
                 self._filters.append(cond)
             elif isinstance(cond, list):
                 for k, v in cond:
-                    escaped = str(v).replace("'", "''")
-                    self._filters.append(f"{k} = '{escaped}'")
+                    clause, params = self._build_lookup_condition(k, v)
+                    self._filters.append(clause)
+                    self._filter_params.extend(params)
         for k, v in kwargs.items():
-            escaped = str(v).replace("'", "''")
-            if hasattr(self, '_table_alias') and '.' not in k:
-                self._filters.append(f"{self._table_alias}.{k} = '{escaped}'")
-            else:
-                self._filters.append(f"{k} = '{escaped}'")
+            clause, params = self._build_lookup_condition(k, v)
+            self._filters.append(clause)
+            self._filter_params.extend(params)
         return self
 
     def filter_in(self, *args):
@@ -320,7 +364,7 @@ class QuerySet:
         self._distinct = True
         return self
 
-    def raw_sql(self, sql):
+    def raw_sql(self, sql, params=None):
         """
             Substitui completamente a query gerada por uma SQL customizada.
 
@@ -333,6 +377,15 @@ class QuerySet:
             Usa exatamente o SQL fornecido, ignorando todos os filtros e joins definidos anteriormente.
             """
         self._raw_sql = sql
+        self._raw_params = list(params or [])
+        return self
+
+    def lock_for_update(self, nowait: bool = False):
+        self._lock_clause = "FOR UPDATE NOWAIT" if nowait else "FOR UPDATE"
+        return self
+
+    def lock_in_share_mode(self):
+        self._lock_clause = "FOR SHARE"
         return self
 
     def exists(self):
@@ -348,8 +401,8 @@ class QuerySet:
             --------------------
             SELECT FIRST 1 1 FROM (<sua_query>) t
             """
-        sql = self._build_query()
-        result = self.conn.execute_query(f"SELECT FIRST 1 1 FROM ({sql}) t")
+        sql, params = self._build_query_data()
+        result = run_query(self.conn, f"SELECT FIRST 1 1 FROM ({sql}) t", params=params)
         return len(result) > 0
 
     def live(self):
@@ -367,20 +420,130 @@ class QuerySet:
         self._cache_enabled = False
         return self
 
-    def _cache_key(self, sql):
-        import hashlib
-        return hashlib.sha256(sql.encode()).hexdigest()
+    def cache(self, enabled: bool = True, ttl: int = None):
+        """
+            Configura o cache para esta consulta específica.
 
-    def _build_query(self):
+            Forma de uso:
+            -------------
+            # Habilita cache com TTL personalizado de 5 minutos
+            queryset.filter(status="ATIVO").cache(ttl=300).all()
+
+            # Desabilita cache (equivalente a .live())
+            queryset.cache(enabled=False).all()
+
+            Parâmetros:
+            -----------
+            enabled : bool
+                Habilita ou desabilita cache para esta consulta
+            ttl : int, optional
+                Time-to-live em segundos (sobrescreve configuração global)
+
+            Observações:
+            ------------
+            Esta configuração afeta apenas a consulta atual e sobrescreve
+            a configuração global de cache.
+            """
+        self._cache_enabled = enabled
+        if ttl is not None:
+            self._cache_ttl = ttl
+        return self
+
+    def only(self, *fields):
+        """
+            Carrega apenas os campos especificados (lazy loading).
+
+            Todos os outros campos serão marcados como "deferred" e só serão
+            carregados quando acessados pela primeira vez.
+
+            Forma de uso:
+            -------------
+            # Carregar apenas id e nome
+            clientes = Cliente.only("id", "nome").all()
+
+            # Acessar campo carregado (sem query adicional)
+            print(clientes[0].nome)  # OK
+
+            # Acessar campo deferred (faz query adicional automaticamente)
+            print(clientes[0].email)  # Carrega do banco
+
+            Parâmetros:
+            -----------
+            *fields : str
+                Nomes dos campos a serem carregados
+
+            Observações:
+            ------------
+            - Melhora performance ao evitar carregar colunas grandes não utilizadas
+            - Útil para colunas BLOB, TEXT, ou com muitos dados
+            - Campos deferred são carregados automaticamente quando acessados
+            """
+        self._only_fields = list(fields)
+        return self
+
+    def defer(self, *fields):
+        """
+            Adia o carregamento dos campos especificados (lazy loading).
+
+            Os campos especificados não serão carregados na consulta inicial,
+            mas serão carregados automaticamente quando acessados.
+
+            Forma de uso:
+            -------------
+            # Não carregar campos grandes/desnecessários
+            produtos = Produto.defer("descricao_completa", "imagem").all()
+
+            # Campos normais são carregados normalmente
+            print(produtos[0].nome)  # OK
+
+            # Campos deferred são carregados sob demanda
+            print(produtos[0].descricao_completa)  # Carrega do banco
+
+            Parâmetros:
+            -----------
+            *fields : str
+                Nomes dos campos a serem adiados
+
+            Observações:
+            ------------
+            - Complementar ao .only() - especifica o que NÃO carregar
+            - Útil para otimizar queries com muitas colunas
+            - Campos deferred são carregados em queries separadas quando necessário
+            """
+        self._deferred_fields = list(fields)
+        return self
+
+    def _cache_key(self, sql, params=None):
+        if not params:
+            payload = sql
+        else:
+            payload = f"{sql}|{repr(list(params))}"
+        return sha256(payload.encode()).hexdigest()
+
+    def _build_query_data(self):
         if self._raw_sql:
-            return self._raw_sql
+            return self._raw_sql, list(self._raw_params)
 
         if not hasattr(self, "_table_alias"):
             self._table_alias = "t1"
 
-        skip_first = ""
+        # Determine limit/offset clause and position
+        skip_first_start = ""
+        skip_first_end = ""
         if self._limit is not None:
-            skip_first = f"SKIP {self._offset or 0} FIRST {self._limit} "
+            # Use dialect-specific limit/offset clause
+            dialect = getattr(self.model, '_dialect', None)
+            if dialect:
+                limit_clause = dialect.limit_offset_clause(self._limit, self._offset)
+                if limit_clause:
+                    # Check if dialect places limit/offset at start or end
+                    if getattr(dialect, 'limit_offset_position', 'end') == 'start':
+                        skip_first_start = f"{limit_clause} "
+                    else:
+                        skip_first_end = f" {limit_clause}"
+            else:
+                # Fallback to Informix syntax (at start)
+                skip_first_start = f"SKIP {self._offset or 0} FIRST {self._limit} "
 
         prefix = "DISTINCT " if self._distinct else ""
 
@@ -389,12 +552,22 @@ class QuerySet:
         else:
             selected_parts = []
 
+            # Determine which fields to load based on .only() and .defer()
+            fields_to_load = self.model._fields
+
+            if self._only_fields:
+                # Load only specified fields
+                fields_to_load = [f for f in fields_to_load if f in self._only_fields]
+            elif self._deferred_fields:
+                # Load all except deferred fields
+                fields_to_load = [f for f in fields_to_load if f not in self._deferred_fields]
+
             # Principal: t1 (sem prefixo se não houver joins)
-            for col in self.model._fields:
+            for col in fields_to_load:
                 if self._joins:
                     selected_parts.append(f"{self._table_alias}.{col} AS {self._table_alias}_{col}")
                 else:
-                    selected_parts.append(f"{self._table_alias}.{col}")
+                    selected_parts.append(f"{col}")
 
             # Joins: t2, t3, etc — evita duplicação
             used_aliases = set()
@@ -411,12 +584,14 @@ class QuerySet:
 
             selected = ", ".join(selected_parts)
 
-        sql = f"SELECT {skip_first}{prefix}{selected} FROM {self.model.__tablename__} {self._table_alias}"
+        base_table = f"{self.model.__tablename__} {self._table_alias}" if self._joins else self.model.__tablename__
+        sql = f"SELECT {skip_first_start}{prefix}{selected} FROM {base_table}"
 
         for join_type, join_table, condition in self._joins:
             sql += f" {join_type} JOIN {join_table} ON {condition}"
 
         conditions = []
+        params = list(self._filter_params)
 
         # 📌 Aqui adicionamos o filtro automático para LEFT ANTI ou RIGHT ANTI
         if hasattr(self, "_anti_join_condition"):
@@ -430,15 +605,17 @@ class QuerySet:
             conditions += [f for f in self._filters]
         if self._in_filters:
             for col, vals in self._in_filters:
-                lista = ", ".join(f"'{v}'" for v in vals)
-                conditions.append(f"{col} IN ({lista})")
+                placeholders = ", ".join("?" for _ in vals)
+                conditions.append(f"{col} IN ({placeholders})")
+                params.extend(list(vals))
         if self._not_in_filters:
             for col, vals, is_subquery in self._not_in_filters:
                 if is_subquery:
                     conditions.append(f"{col} NOT IN ({vals})")
                 else:
-                    lista = ", ".join(f"'{v}'" for v in vals)
-                    conditions.append(f"{col} NOT IN ({lista})")
+                    placeholders = ", ".join("?" for _ in vals)
+                    conditions.append(f"{col} NOT IN ({placeholders})")
+                    params.extend(list(vals))
 
         if conditions:
             sql += " WHERE " + " AND ".join(conditions)
@@ -452,6 +629,15 @@ class QuerySet:
         if self._order_by:
             sql += " ORDER BY " + ", ".join(self._order_by)
 
+        # Add limit/offset at end if dialect requires it
+        sql += skip_first_end
+        if self._lock_clause:
+            sql += f" {self._lock_clause}"
+
+        return sql, params
+
+    def _build_query(self):
+        sql, _ = self._build_query_data()
         return sql
 
     def preload(self, *relations):
@@ -459,38 +645,142 @@ class QuerySet:
         return self
 
     def all(self):
-        sql = self._build_query()
-        key = self._cache_key(sql)
+        sql, params = self._build_query_data()
+        key = self._cache_key(sql, params)
 
-        if self._cache_enabled:
-            cached = _query_result_cache.get(key)
-            if cached:
-                results, timestamp = cached
-                if time.time() - timestamp < self._cache_ttl:
-                    resultset = ResultSet([
-                        self._create_instance_from_row(row) for row in results
-                    ])
-                    if self._select_fields:
-                        resultset._selected_fields = self._select_fields
-                    return resultset
+        # Determine if cache is enabled for this query
+        cache_enabled = (
+            self._cache_enabled
+            if self._cache_enabled is not None
+            else self._cache_config.enabled
+        )
 
-        results = self.conn.execute_query(sql)
-        if self._cache_enabled:
-            _query_result_cache[key] = (results, time.time())
+        # Get performance monitor
+        monitor = get_monitor()
+
+        # Check cache if enabled
+        if cache_enabled:
+            # If custom TTL is set, temporarily override global config
+            if self._cache_ttl is not None:
+                original_ttl = self._cache_config.ttl
+                self._cache_config.ttl = self._cache_ttl
+                cached = self._cache_config.get(key)
+                self._cache_config.ttl = original_ttl
+            else:
+                cached = self._cache_config.get(key)
+
+            if cached is not None:
+                # Cache hit - record metrics
+                with monitor.measure(sql) as ctx:
+                    ctx.set_cache_hit(True)
+                    ctx.set_rows(len(cached))
+
+                resultset = ResultSet([
+                    self._create_instance_from_row(row) for row in cached
+                ])
+                if self._select_fields:
+                    resultset._selected_fields = self._select_fields
+                self._apply_preloads(resultset)
+                return resultset
+
+        # Execute query with performance monitoring
+        with monitor.measure(sql) as ctx:
+            results = run_query(self.conn, sql, params=params)
+            ctx.set_rows(len(results))
+            ctx.set_cache_hit(False)
+
+        # Store in cache if enabled
+        if cache_enabled:
+            self._cache_config.set(key, results)
 
         resultset = ResultSet([
             self._create_instance_from_row(row) for row in results
         ], selected_fields=self._select_fields if self._select_fields else None)
+        self._apply_preloads(resultset)
+        return resultset
+
+    def _apply_preloads(self, resultset):
+        if not self._preloads or not resultset:
+            return resultset
+        relation_configs = getattr(self.model, "_relation_configs", {})
+        from wborm.core import RelationCollection
+
+        for relation in self._preloads:
+            config = relation_configs.get(relation)
+            if not config:
+                continue
+
+            related_model = self.model._resolve_related_model(config["model"])
+            local_key = config["local_key"]
+            remote_key = config["remote_key"]
+            values = [getattr(item, local_key, None) for item in resultset if getattr(item, local_key, None) is not None]
+            if not values:
+                continue
+
+            related_items = related_model.filter_in(remote_key, list(dict.fromkeys(values))).all()
+            if config["kind"] == "belongs_to":
+                mapping = {getattr(item, remote_key, None): item for item in related_items}
+                for row in resultset:
+                    row.__dict__[relation] = mapping.get(getattr(row, local_key, None))
+            elif config["kind"] == "many_to_many":
+                through = config["through"]
+                target_key = config["target_key"]
+                target_model = related_model
+                owner_ids = list(dict.fromkeys(values))
+                owner_list = ", ".join("?" for _ in owner_ids)
+                join_rows = run_query(
+                    self.conn,
+                    f"SELECT {local_key}, {remote_key} FROM {through} WHERE {local_key} IN ({owner_list})",
+                    params=owner_ids,
+                )
+                target_ids = list(dict.fromkeys(row[remote_key] for row in join_rows if remote_key in row))
+                if not target_ids:
+                    for row in resultset:
+                        setattr(row, relation, [])
+                    continue
+                related_items = target_model.filter_in(target_key, target_ids).all()
+                target_map = {getattr(item, target_key, None): item for item in related_items}
+                grouped = {}
+                for link in join_rows:
+                    grouped.setdefault(link[local_key], []).append(target_map.get(link[remote_key]))
+                for row in resultset:
+                    row.__dict__[relation] = RelationCollection(
+                        row,
+                        config,
+                        [item for item in grouped.get(getattr(row, local_key, None), []) if item is not None],
+                    )
+            else:
+                grouped = {}
+                for item in related_items:
+                    grouped.setdefault(getattr(item, remote_key, None), []).append(item)
+                for row in resultset:
+                    row.__dict__[relation] = grouped.get(getattr(row, local_key, None), [])
         return resultset
 
     def _create_instance_from_row(self, row):
-        obj = self.model()
+        identity_source = {}
+        for key, value in row.items():
+            key = str(key)
+            if self._joins:
+                if key.startswith("t1_"):
+                    identity_source[key[3:]] = value
+                elif key in self.model._fields:
+                    identity_source[key] = value
+            else:
+                identity_source[key] = value
+
+        obj = self.model.from_row(identity_source, session=self.session) if hasattr(self.model, "from_row") else self.model(**identity_source)
+        if self.session:
+            obj = self.session.register_loaded(obj)
+
         for k, v in row.items():
             k = str(k)
             if self._joins:  # só ignora sem tX_ se houver joins
                 if not k.startswith("t"):
                     continue
-            obj.__dict__[k] = v
+            normalized = self.model._normalize_value(k[3:] if k.startswith("t1_") else k, v) if hasattr(self.model, "_normalize_value") else v
+            object.__setattr__(obj, k, normalized)
+        obj._connection = self.conn
         return obj
 
     def first(self):
@@ -523,9 +813,8 @@ class QuerySet:
             """
         sql = f"SELECT COUNT(*) as count FROM {self.model.__tablename__}"
         if self._filters:
-            conditions = ["{} = '{}'".format(k, str(v).replace("'", "''")) for k, v in self._filters]
-            sql += " WHERE " + " AND ".join(conditions)
-        result = self.conn.execute_query(sql)
+            sql += " WHERE " + " AND ".join(self._filters)
+        result = run_query(self.conn, sql, params=self._filter_params)
         return result[0]["count"] if result else 0
 
     def max(self, column):
@@ -541,7 +830,7 @@ class QuerySet:
         if self._filters:
             sql += " WHERE " + " AND ".join(self._filters)
 
-        result = self.conn.execute_query(sql)
+        result = run_query(self.conn, sql, params=self._filter_params)
         return result[0]["max_value"] if result else None
 
     def min(self, column):
@@ -557,7 +846,7 @@ class QuerySet:
         if self._filters:
             sql += " WHERE " + " AND ".join(self._filters)
 
-        result = self.conn.execute_query(sql)
+        result = run_query(self.conn, sql, params=self._filter_params)
         return result[0]["min_value"] if result else None
 
     def sum(self, column):
@@ -573,8 +862,180 @@ class QuerySet:
         if self._filters:
             sql += " WHERE " + " AND ".join(self._filters)
 
-        result = self.conn.execute_query(sql)
+        result = run_query(self.conn, sql, params=self._filter_params)
         return result[0]["sum_value"] if result else None
+
+    def paginate(self, page: int = 1, page_size: int = 50):
+        """
+            Pagina os resultados da consulta com metadados completos.
+
+            Forma de uso:
+            -------------
+            # Página 1 com 20 itens por página
+            page = Cliente.filter(status="ATIVO").paginate(page=1, page_size=20)
+
+            # Acessar itens
+            for cliente in page.items:
+                print(cliente.nome)
+
+            # Metadados de paginação
+            print(f"Página {page.page} de {page.pages}")
+            print(f"Total: {page.total} clientes")
+
+            # Navegação
+            if page.has_next:
+                next_page = Cliente.filter(status="ATIVO").paginate(page.next_page)
+
+            Parâmetros:
+            -----------
+            page : int
+                Número da página (1-indexed, padrão: 1)
+            page_size : int
+                Itens por página (padrão: 50)
+
+            Retorna:
+            --------
+            Page object com:
+                - items: Lista de resultados da página
+                - page: Número da página atual
+                - page_size: Itens por página
+                - total: Total de itens
+                - pages: Total de páginas
+                - has_next: Se existe próxima página
+                - has_prev: Se existe página anterior
+                - next_page: Número da próxima página
+                - prev_page: Número da página anterior
+
+            Observações:
+            ------------
+            - Usa SKIP/FIRST para paginação eficiente
+            - Calcula automaticamente o total de páginas
+            - Fornece metadados completos para UI de paginação
+            """
+        from wborm.pagination import Paginator
+        paginator = Paginator(self, page_size=page_size)
+        return paginator.page(page)
+
+    def union(self, other_queryset, all=False):
+        """
+            Combina resultados de duas queries usando UNION.
+
+            Por padrão, UNION remove duplicatas. Use all=True para UNION ALL.
+
+            Forma de uso:
+            -------------
+            # UNION (remove duplicatas)
+            resultado = Cliente.filter(cidade="SP").union(
+                Cliente.filter(cidade="RJ")
+            )
+
+            # UNION ALL (mantém duplicatas)
+            resultado = Cliente.filter(tipo="VIP").union(
+                Cliente.filter(tipo="Premium"),
+                all=True
+            )
+
+            Parâmetros:
+            -----------
+            other_queryset : QuerySet
+                Outro queryset para combinar
+            all : bool
+                Se True, usa UNION ALL (mantém duplicatas)
+
+            Retorna:
+            --------
+            QuerySet com operação UNION configurada
+
+            Observações:
+            ------------
+            - Ambas as queries devem ter o mesmo número de colunas
+            - Tipos de dados devem ser compatíveis
+            - ORDER BY só pode ser aplicado no resultado final
+            """
+        self._union_queries.append(other_queryset)
+        self._union_all = all
+        return self
+
+    def intersect(self, other_queryset):
+        """
+            Retorna apenas registros presentes em ambas as queries (INTERSECT).
+
+            Forma de uso:
+            -------------
+            # Clientes que são VIP E estão em São Paulo
+            resultado = Cliente.filter(tipo="VIP").intersect(
+                Cliente.filter(cidade="São Paulo")
+            )
+
+            Parâmetros:
+            -----------
+            other_queryset : QuerySet
+                Outro queryset para intersecção
+
+            Retorna:
+            --------
+            ResultSet com registros comuns
+
+            Observações:
+            ------------
+            - Remove automaticamente duplicatas
+            - Ambas queries devem ter mesma estrutura
+            - Equivalente a um AND lógico entre conjuntos
+            """
+        # INTERSECT: Executa ambas queries e retorna apenas IDs em comum
+        results1 = self.all()
+        results2 = other_queryset.all()
+
+        # Assume que modelos têm um campo 'id' ou primeiro campo como PK
+        pk_fields = self.model._pk_field_names() if hasattr(self.model, "_pk_field_names") else [getattr(self.model, '_pk_field', None) or self.model._fields[0]]
+        key_for = lambda record: tuple(getattr(record, field) for field in pk_fields) if len(pk_fields) > 1 else getattr(record, pk_fields[0])
+
+        ids1 = {key_for(r) for r in results1}
+        ids2 = {key_for(r) for r in results2}
+
+        common_ids = ids1 & ids2
+
+        # Retorna apenas registros com IDs em comum
+        return ResultSet([r for r in results1 if key_for(r) in common_ids])
+
+    def except_(self, other_queryset):
+        """
+            Retorna registros da primeira query que NÃO estão na segunda (EXCEPT).
+
+            Forma de uso:
+            -------------
+            # Clientes VIP que NÃO estão em São Paulo
+            resultado = Cliente.filter(tipo="VIP").except_(
+                Cliente.filter(cidade="São Paulo")
+            )
+
+            Parâmetros:
+            -----------
+            other_queryset : QuerySet
+                Queryset com registros a serem excluídos
+
+            Retorna:
+            --------
+            ResultSet com registros únicos da primeira query
+
+            Observações:
+            ------------
+            - Remove automaticamente duplicatas
+            - Equivalente a diferença de conjuntos (A - B)
+            - Método chamado except_ (com underscore) pois 'except' é palavra reservada
+            """
+        results1 = self.all()
+        results2 = other_queryset.all()
+
+        pk_fields = self.model._pk_field_names() if hasattr(self.model, "_pk_field_names") else [getattr(self.model, '_pk_field', None) or self.model._fields[0]]
+        key_for = lambda record: tuple(getattr(record, field) for field in pk_fields) if len(pk_fields) > 1 else getattr(record, pk_fields[0])
+
+        ids1 = {key_for(r) for r in results1}
+        ids2 = {key_for(r) for r in results2}
+
+        diff_ids = ids1 - ids2
+
+        return ResultSet([r for r in results1 if key_for(r) in diff_ids])
 
     def show(self, tablefmt="grid"):
         """
@@ -623,7 +1084,6 @@ class QuerySet:
             - Usa um limite padrão de 500 registros (configurável)
             - Exibe a tabela formatada no terminal com cores (verde = direto do banco, azul = cache)
             """
-        from tabulate import tabulate
         from collections import defaultdict
         import time
 
@@ -662,7 +1122,7 @@ class QuerySet:
                 row.append(cols.get(col, ""))
             rows.append(row)
 
-        table = tabulate(rows, headers=headers, tablefmt="grid")
+        table = tabulate_data(rows, headers=headers, tablefmt="grid")
 
         color = BLUE if getattr(self.model, "_from_cache", False) else GREEN
         colored_lines = []
@@ -837,11 +1297,9 @@ class ResultSet(list):
             return
 
         import time
-        from tabulate import tabulate
-        from colorama import Fore, Style
         from collections import OrderedDict
-        import re
         from hashlib import md5
+        Fore, Style = terminal_colors()
 
         now = time.time()
 
@@ -895,7 +1353,7 @@ class ResultSet(list):
         cor = Fore.GREEN if not getattr(model_cls, "_from_cache", False) else Fore.BLUE
 
         def print_page(rows_subset):
-            tabela = tabulate(rows_subset, headers=headers, tablefmt=tablefmt)
+            tabela = tabulate_data(rows_subset, headers=headers, tablefmt=tablefmt)
             linhas_coloridas = []
             for linha in tabela.splitlines():
                 if linha and (linha[0] in "+╒╞╘╤╧═" or all(c in "+-=│╒╞╘╤╧═│ " for c in linha)):

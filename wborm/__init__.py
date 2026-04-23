@@ -1,17 +1,111 @@
-__version__ = "0.3.2"
+__version__ = "0.4.0"
 
 from .core import Model
 from .fields import Field
-from .utils import generate_model, get_model
+from .utils import generate_model, get_model, get_global_connection
 from .model_cache import generate_model_stub, try_load_model_from_disk
 from .query import QuerySet
+from .session import Session
+from .fastapi import create_session_dependency, session_scope
+from .fastapi import register_exception_handlers, register_observability_middleware, api_response, apply_api_filters, paginate_query
+from .exceptions import ORMError, ORMValidationError, ORMConcurrencyError, ORMDatabaseError
+from .pydantic import create_read_schema, create_write_schema, dump_entity
+from .migrations import (
+    Migration,
+    Migrator,
+    CreateTableMigration,
+    DropTableMigration,
+    AddColumnMigration,
+    DropColumnMigration,
+    RenameColumnMigration,
+    AddForeignKeyMigration,
+    CreateIndexMigration,
+    create_model_table_sql,
+    add_column_sql,
+    modify_column_sql,
+    drop_table_sql,
+    drop_column_sql,
+    rename_column_sql,
+    create_index_sql,
+    drop_index_sql,
+    add_foreign_key_sql,
+    diff_model_schema,
+)
 from .expressions import col, date, now, raw, format_informix_datetime
 from .bootstrap import auto_load_cached_models
 from wborm.registry import _model_cache, _model_registry, _connection
-from wborm.bootstrap import auto_load_cached_models
+from .cache_config import (
+    configure_cache,
+    clear_cache,
+    cache_stats,
+    invalidate_cache,
+    get_cache_config,
+    CacheConfig,
+    MemoryCacheBackend,
+    LRUCacheBackend,
+    DiskCacheBackend,
+)
+from .lazy_loading import (
+    batch_load_fields,
+    prefetch_related,
+    defer_fields,
+    only_fields,
+)
+from .pagination import (
+    paginate,
+    cursor_paginate,
+    Paginator,
+    CursorPaginator,
+    Page,
+)
+from .performance import (
+    configure_monitoring,
+    get_performance_stats,
+    print_performance_report,
+    reset_performance_stats,
+    get_monitor,
+    PerformanceMonitor,
+)
+from .query_optimizer import (
+    analyze_query,
+    print_query_report,
+    register_table_stats,
+    get_optimizer,
+    QueryOptimizer,
+)
+from .aggregates import (
+    Count,
+    Sum,
+    Avg,
+    Min,
+    Max,
+    StdDev,
+    Variance,
+    aggregate_with_cache,
+)
+from .window_functions import (
+    Window,
+    ROW_NUMBER,
+    RANK,
+    DENSE_RANK,
+    LAG,
+    LEAD,
+    FIRST_VALUE,
+    LAST_VALUE,
+)
+from .dialects import (
+    BaseDialect,
+    InformixDialect,
+    DB2Dialect,
+    OracleDialect,
+    get_dialect,
+    detect_dialect,
+    register_dialect,
+)
 import inspect
 from typing import TYPE_CHECKING
-import sys, os
+import sys
+import os
 
 
 __all__ = [
@@ -21,17 +115,110 @@ __all__ = [
     "get_model",
     "generate_model_stub",
     "QuerySet",
+    "Session",
+    "create_session_dependency",
+    "session_scope",
+    "register_exception_handlers",
+    "register_observability_middleware",
+    "api_response",
+    "apply_api_filters",
+    "paginate_query",
+    "ORMError",
+    "ORMValidationError",
+    "ORMConcurrencyError",
+    "ORMDatabaseError",
+    "create_read_schema",
+    "create_write_schema",
+    "dump_entity",
+    "Migration",
+    "Migrator",
+    "CreateTableMigration",
+    "DropTableMigration",
+    "AddColumnMigration",
+    "DropColumnMigration",
+    "RenameColumnMigration",
+    "AddForeignKeyMigration",
+    "CreateIndexMigration",
+    "create_model_table_sql",
+    "add_column_sql",
+    "modify_column_sql",
+    "drop_table_sql",
+    "drop_column_sql",
+    "rename_column_sql",
+    "create_index_sql",
+    "drop_index_sql",
+    "add_foreign_key_sql",
+    "diff_model_schema",
     "col",
     "date",
     "now",
     "raw",
     "format_informix_datetime",
     "register_global_connection",
+    "get_global_connection",
+    # Cache configuration
+    "configure_cache",
+    "clear_cache",
+    "cache_stats",
+    "invalidate_cache",
+    "get_cache_config",
+    "CacheConfig",
+    "MemoryCacheBackend",
+    "LRUCacheBackend",
+    "DiskCacheBackend",
+    # Lazy loading
+    "batch_load_fields",
+    "prefetch_related",
+    "defer_fields",
+    "only_fields",
+    # Pagination
+    "paginate",
+    "cursor_paginate",
+    "Paginator",
+    "CursorPaginator",
+    "Page",
+    # Performance monitoring
+    "configure_monitoring",
+    "get_performance_stats",
+    "print_performance_report",
+    "reset_performance_stats",
+    "get_monitor",
+    "PerformanceMonitor",
+    # Query optimization
+    "analyze_query",
+    "print_query_report",
+    "register_table_stats",
+    "get_optimizer",
+    "QueryOptimizer",
+    # Aggregates
+    "Count",
+    "Sum",
+    "Avg",
+    "Min",
+    "Max",
+    "StdDev",
+    "Variance",
+    "aggregate_with_cache",
+    # Window functions
+    "Window",
+    "ROW_NUMBER",
+    "RANK",
+    "DENSE_RANK",
+    "LAG",
+    "LEAD",
+    "FIRST_VALUE",
+    "LAST_VALUE",
+    # Database dialects
+    "BaseDialect",
+    "InformixDialect",
+    "DB2Dialect",
+    "OracleDialect",
+    "get_dialect",
+    "detect_dialect",
+    "register_dialect",
 ]
 
-# Este bloco é mágico
-import builtins
-
+# Connection holder for magic __getattr__
 _conn_holder = {}
 
 
@@ -47,6 +234,8 @@ def register_global_connection(conn):
 
 
 def __getattr__(name):
+    if name.startswith("_") or name in {"pytest_plugins", "setUpModule", "setup_module", "tearDownModule", "teardown_module"}:
+        raise AttributeError(name)
     conn = _conn_holder.get("conn")
     if not conn:
         raise RuntimeError("Conexão global não registrada. Use `register_global_connection(conn)` primeiro.")

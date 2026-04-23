@@ -1,12 +1,11 @@
 # wborm/bootstrap.py
 import os
-import pickle
 import inspect
-from cryptography.fernet import Fernet
 from wborm.registry import _model_registry, _model_cache
 from wborm.core import Model
 from wborm.fields import Field
-from wborm.model_cache import get_or_create_key
+from wborm.cache_manager import decrypt_data
+from wborm.file_utils import CACHE_DIR, model_cache_path
 
 
 def auto_load_cached_models(conn, inject_globals=True, verbose=False, target_globals=None):
@@ -18,24 +17,21 @@ def auto_load_cached_models(conn, inject_globals=True, verbose=False, target_glo
         from wborm.bootstrap import auto_load_cached_models
         auto_load_cached_models(conn)
     """
-    key = get_or_create_key()
-    folder = ".wbmodels"
-    if not os.path.isdir(folder):
+    if not os.path.isdir(CACHE_DIR):
         return
 
     caller_globals = target_globals or inspect.stack()[1].frame.f_globals
 
-    for file in os.listdir(folder):
+    for file in os.listdir(CACHE_DIR):
         if not file.endswith(".wbm"):
             continue
 
         try:
             table = file.replace(".wbm", "")
-            path = os.path.join(folder, file)
+            path = model_cache_path(table)
             with open(path, "rb") as f:
                 encrypted = f.read()
-            data = Fernet(key).decrypt(encrypted)
-            cached = pickle.loads(data)
+            cached = decrypt_data(encrypted)
 
             field_map = {}
             for name, f in cached["fields"].items():

@@ -22,3 +22,12 @@ Welcome to the documentation for `wborm`, a lightweight and expressive ORM libra
 ```bash
 pip install wborm
 ```
+
+## Recommended Guides
+
+- [WBJDBC integration](integra-wbjdbc.md)
+- [Informix integration](informix_integration.md)
+- [FastAPI production guide](fastapi_production_guide.md)
+- [Cache configuration](cache_configuration.md)
+- [Global connection](global_connection_guide.md)
+- [Multi-database support](multi_database_support.md)

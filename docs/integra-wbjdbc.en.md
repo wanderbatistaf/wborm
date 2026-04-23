@@ -1,94 +1,57 @@
 # Integration Between `wborm` and `wbjdbc`
 
-## Why Use `wborm` Together with `wbjdbc`?
+## Recommended flow
 
-### 1. Native and Direct Integration
-
-`wborm` was **designed to work directly with the connection created by `wbjdbc`**, without needing to adapt cursors, drivers, or perform additional mappings.
+`wbjdbc` handles the optimized JDBC connection. `wborm` handles models, query building, sessions, and persistence.
 
 ```python
-from wbjdbc import connect_to_db
-from my_model import Cliente
+from wbjdbc import connect_optimized
+from wborm import register_global_connection, generate_model
 
-conn = connect_to_db(...)
-Cliente._connection = conn
-clientes = Cliente.filter(idade=25).all()
+conn = connect_optimized(
+    db_type="informix-sqli",
+    host="localhost",
+    port=9088,
+    database="stores_demo",
+    user="informix",
+    password="in4mix",
+    server="informix",
+)
+
+register_global_connection(conn)
+Customer = generate_model("customer")
+
+customers = Customer.filter(customer_num__gt=100).limit(10).all()
 ```
 
----
+## Responsibility split
 
-### 2. Full Focus on JDBC and Informix Ecosystem
+| Feature | `wbjdbc` | `wborm` |
+|---|---|---|
+| JVM / JDBC driver bootstrap | ✅ | ❌ |
+| Optimized connection | ✅ | ❌ |
+| Pooling / metadata cache | ✅ | ❌ |
+| `execute_batch()` | ✅ | used when available |
+| ORM / models | ❌ | ✅ |
+| Query builder | ❌ | ✅ |
+| Session / Unit of Work | ❌ | ✅ |
+| Simple migrations | ❌ | ✅ |
 
-- `wbjdbc` solves a core problem: **connecting Python to legacy databases via JDBC**, like **Informix**, which usually requires Java.
-- `wborm` handles the next step: **querying and manipulating those data through an ORM**, without writing raw SQL all the time.
+## What `wbjdbc 2.0` improves for `wborm`
 
-Together, they create a natural flow:
-```
-JDBC → wbjdbc → connection → wborm → model/table
-```
+- `bulk_add()`, `bulk_update()`, and `bulk_delete()` can leverage `execute_batch()`
+- the ORM keeps the same API while benefiting from pooling and metadata caching
+- the recommended connection entry point is now `connect_optimized(...)`
 
----
+## `wborm` features that matter for Informix
 
-### 3. Safety and Abstraction Without Losing Control
+- dialect-aware `SKIP/FIRST`
+- explicit transactions
+- pessimistic locking with `.lock_for_update()`
+- eager loading with `.preload(...)`
+- partial lazy loading with `.only()` / `.defer()`
+- hooks, validation, serialization, and native SQL
 
-- `wbjdbc` manages JVM, classpath, `.jar` files, authentication, etc.
-- `wborm` abstracts SQL reading and writing safely: requires `confirm=True`, validates fields, enforces `WHERE` on deletes, etc.
-- Neither tries to hide too much of what’s going on.
+## Environment compatibility
 
-You gain productivity **without losing SQL clarity**.
-
----
-
-### 4. Perfect for ETL, BI, and Data Transformation Workflows
-
-With `wbjdbc`, you can already run JDBC queries from Python. But with `wborm`, you can:
-
-- Map tables as classes  
-- Use `.filter()` and `.select()` without worrying about raw SQL strings  
-- Integrate directly with Pandas or Spark  
-
-Example using DataFrame:
-
-```python
-from wborm.core import Model
-import pandas as pd
-
-df = pd.DataFrame([c.to_dict() for c in Cliente.all()])
-```
-
----
-
-### 5. Compatibility with Informix Advanced Features
-
-`wborm` respects Informix-specific behavior such as:
-
-- `SKIP` and `FIRST` immediately after `SELECT`  
-- Transaction-level locks (`BEGIN WORK / COMMIT WORK`)  
-- Prevents updates or deletes without proper `WHERE` clauses  
-
-Things that generic ORMs often handle poorly for Informix-like databases.
-
----
-
-## Comparison Table
-
-| Feature                        | wbjdbc                         | wborm                            |
-|-------------------------------|--------------------------------|----------------------------------|
-| JVM Initialization            | ✅                              | ❌                               |
-| Loads `.jar` and drivers      | ✅                              | ❌                               |
-| Creates JDBC connection       | ✅                              | ❌                               |
-| Executes SQL                  | ✅ (`cursor.execute`)           | ✅ (`.raw_sql()` or `.filter()`) |
-| ORM with validation and models| ❌                              | ✅                               |
-| Automatic model generation    | ❌                              | ✅ (`generate_model`)            |
-
----
-
-## Conclusion
-
-If you work with Informix, DB2, Oracle, or any other JDBC-compatible database — the `wbjdbc` + `wborm` combo offers:
-
-- Reliable and automated Java-based connection  
-- Lightweight and powerful ORM with validation and safety  
-- Seamless usage with Pandas, Spark, and any Python tool
-
-Harness the power of JDBC with the simplicity of Python!
+For real `wbjdbc` integration, prefer Python `3.12` or `3.13`. On `3.14`-only environments, `JPype1` installation may fail and require native build tools.
