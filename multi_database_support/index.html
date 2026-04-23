@@ -1,0 +1,2202 @@
+
+<!doctype html>
+<html lang="pt" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="ORM leve com suporte a JDBC e Informix">
+      
+      
+        <meta name="author" content="Wanderson Batista">
+      
+      
+        <link rel="canonical" href="https://wanderbatistaf.github.io/wborm/multi_database_support/">
+      
+      
+        <link rel="prev" href="../global_connection_guide/">
+      
+      
+        <link rel="next" href="../testing/">
+      
+      
+        
+          <link rel="alternate" href="./" hreflang="pt">
+        
+          <link rel="alternate" href="../en/multi_database_support/" hreflang="en">
+        
+      
+      
+      <link rel="icon" href="../images/wborm.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+    
+    
+      
+        <title>Multi-database - WBORM</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/extra.css">
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#multi-database-support" class="md-skip">
+          Ir para o conteúdo
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Cabeçalho">
+    <a href=".." title="WBORM" class="md-header__button md-logo" aria-label="WBORM" data-md-component="logo">
+      
+  <img src="../images/wborm.png" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            WBORM
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Multi-database
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-hidden="true"  type="radio" name="__palette" id="__palette_0">
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+      <div class="md-header__option">
+  <div class="md-select">
+    
+    <button class="md-header__button md-icon" aria-label="Selecione o idioma">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m12.87 15.07-2.54-2.51.03-.03A17.5 17.5 0 0 0 14.07 6H17V4h-7V2H8v2H1v2h11.17C11.5 7.92 10.44 9.75 9 11.35 8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5 3.11 3.11zM18.5 10h-2L12 22h2l1.12-3h4.75L21 22h2zm-2.62 7 1.62-4.33L19.12 17z"/></svg>
+    </button>
+    <div class="md-select__inner">
+      <ul class="md-select__list">
+        
+          <li class="md-select__item">
+            <a href="./" hreflang="pt" class="md-select__link">
+              Português
+            </a>
+          </li>
+        
+          <li class="md-select__item">
+            <a href="../en/multi_database_support/" hreflang="en" class="md-select__link">
+              English
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</div>
+    
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/wanderbatistaf/wborm" title="Ir ao repositório" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    wanderbatistaf/wborm
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Abas" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href=".." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Inicio
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../modelos/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Fundamentos
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../integra-wbjdbc/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Integracoes
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../cache_configuration/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Recursos Avancados
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../testing/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Projeto
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+  
+
+<nav class="md-nav md-nav--primary md-nav--lifted md-nav--integrated" aria-label="Navegação" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="WBORM" class="md-nav__button md-logo" aria-label="WBORM" data-md-component="logo">
+      
+  <img src="../images/wborm.png" alt="logo">
+
+    </a>
+    WBORM
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/wanderbatistaf/wborm" title="Ir ao repositório" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    wanderbatistaf/wborm
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Inicio
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Fundamentos
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Fundamentos
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../modelos/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Modelos
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../exemplos/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Exemplos
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../por-que-usar/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Por que usar
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Integracoes
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Integracoes
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../integra-wbjdbc/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    WBJDBC
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../informix_integration/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Informix
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../fastapi_production_guide/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    FastAPI em producao
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Recursos Avancados
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Recursos Avancados
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../cache_configuration/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Cache
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../performance_examples/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Exemplos avancados
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../global_connection_guide/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Conexao global
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Multi-database
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Multi-database
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Índice">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Índice
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#table-of-contents" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Table of Contents
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#overview" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Overview
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#supported-databases" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Supported Databases
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Supported Databases">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ibm-informix" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        IBM Informix
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ibm-db2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        IBM DB2
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#oracle-database" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Oracle Database
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#database-dialects" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Database Dialects
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Database Dialects">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#what-is-a-dialect" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What is a Dialect?
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#dialect-interface" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Dialect Interface
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#dialect-properties" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Dialect Properties
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#automatic-detection" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Automatic Detection
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Automatic Detection">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#manual-dialect-access" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Manual Dialect Access
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#usage-examples" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Usage Examples
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Usage Examples">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#example-1-same-code-multiple-databases" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Example 1: Same Code, Multiple Databases
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#example-2-pagination-across-databases" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Example 2: Pagination Across Databases
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#example-3-database-specific-features" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Example 3: Database-Specific Features
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#example-4-type-mapping" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Example 4: Type Mapping
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#example-5-custom-sql-with-dialect-functions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Example 5: Custom SQL with Dialect Functions
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#advanced-features" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Advanced Features
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Advanced Features">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#optimizer-hints" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Optimizer Hints
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#information-schema-queries" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Information Schema Queries
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#window-functions-with-dialects" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Window Functions with Dialects
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#custom-dialects" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Custom Dialects
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Custom Dialects">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#step-1-create-dialect-class" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 1: Create Dialect Class
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-2-register-custom-dialect" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 2: Register Custom Dialect
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-3-use-with-connection" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 3: Use with Connection
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#best-practices" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Best Practices
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Best Practices">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-let-wborm-handle-dialect-selection" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Let WBORM Handle Dialect Selection
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-check-feature-support" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Check Feature Support
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-use-dialect-methods-for-custom-sql" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Use Dialect Methods for Custom SQL
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4-register-table-statistics" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Register Table Statistics
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#migration-guide" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Migration Guide
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Migration Guide">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#moving-from-informix-only-to-multi-database" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Moving from Informix-Only to Multi-Database
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#troubleshooting" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Troubleshooting
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Troubleshooting">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#dialect-not-detected" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Dialect Not Detected
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#wrong-sql-generated" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Wrong SQL Generated
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#feature-not-supported" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Feature Not Supported
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#technical-details" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Technical Details
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Technical Details">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#limitoffset-positioning" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Limit/Offset Positioning
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#type-mapping" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Type Mapping
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#query-building-process" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Query Building Process
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#summary" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Summary
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Projeto
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Projeto
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../testing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Testes
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../changelog/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Changelog
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="multi-database-support">Multi-Database Support<a class="headerlink" href="#multi-database-support" title="Permanent link">&para;</a></h1>
+<p>Complete documentation for WBORM's multi-database support system.</p>
+<hr />
+<h2 id="table-of-contents">Table of Contents<a class="headerlink" href="#table-of-contents" title="Permanent link">&para;</a></h2>
+<ol>
+<li><a href="#overview">Overview</a></li>
+<li><a href="#supported-databases">Supported Databases</a></li>
+<li><a href="#database-dialects">Database Dialects</a></li>
+<li><a href="#automatic-detection">Automatic Detection</a></li>
+<li><a href="#usage-examples">Usage Examples</a></li>
+<li><a href="#advanced-features">Advanced Features</a></li>
+<li><a href="#custom-dialects">Custom Dialects</a></li>
+</ol>
+<hr />
+<h2 id="overview">Overview<a class="headerlink" href="#overview" title="Permanent link">&para;</a></h2>
+<p>WBORM now supports multiple database systems through a comprehensive dialect system. Each database has its own dialect that handles:</p>
+<ul>
+<li><strong>SQL Syntax Variations</strong>: Different LIMIT/OFFSET syntax, string functions, date functions</li>
+<li><strong>Type Mapping</strong>: Database-specific type conversion to Python types</li>
+<li><strong>Query Optimization</strong>: Database-specific optimizer hints</li>
+<li><strong>Feature Detection</strong>: Automatic detection of supported features (window functions, CTEs, etc.)</li>
+</ul>
+<p><strong>Key Benefits:</strong>
+- Write once, run on Informix, DB2, or Oracle
+- Automatic dialect detection
+- Zero code changes for basic queries
+- Database-specific optimizations when needed</p>
+<hr />
+<h2 id="supported-databases">Supported Databases<a class="headerlink" href="#supported-databases" title="Permanent link">&para;</a></h2>
+<h3 id="ibm-informix">IBM Informix<a class="headerlink" href="#ibm-informix" title="Permanent link">&para;</a></h3>
+<p><strong>Versions:</strong> IDS 11.x, 12.x, 14.x
+<strong>Dialect:</strong> <code>InformixDialect</code></p>
+<p><strong>Features:</strong>
+- ✅ SKIP/FIRST syntax for pagination
+- ✅ Window functions (12.10+)
+- ✅ Common Table Expressions (CTEs)
+- ✅ Comprehensive type mapping</p>
+<p><strong>Example SQL:</strong>
+<div class="highlight"><pre><span></span><code><span class="k">SELECT</span><span class="w"> </span><span class="n">SKIP</span><span class="w"> </span><span class="mi">20</span><span class="w"> </span><span class="k">FIRST</span><span class="w"> </span><span class="mi">10</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">customers</span>
+</code></pre></div></p>
+<h3 id="ibm-db2">IBM DB2<a class="headerlink" href="#ibm-db2" title="Permanent link">&para;</a></h3>
+<p><strong>Versions:</strong> DB2 9.7+, 10.x, 11.x
+<strong>Dialect:</strong> <code>DB2Dialect</code></p>
+<p><strong>Features:</strong>
+- ✅ OFFSET/FETCH syntax for pagination
+- ✅ Window functions (9.7+)
+- ✅ Common Table Expressions (CTEs)
+- ✅ DB2 optimizer hints</p>
+<p><strong>Example SQL:</strong>
+<div class="highlight"><pre><span></span><code><span class="k">SELECT</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">customers</span>
+<span class="k">OFFSET</span><span class="w"> </span><span class="mi">20</span><span class="w"> </span><span class="k">ROWS</span><span class="w"> </span><span class="k">FETCH</span><span class="w"> </span><span class="k">FIRST</span><span class="w"> </span><span class="mi">10</span><span class="w"> </span><span class="k">ROWS</span><span class="w"> </span><span class="k">ONLY</span>
+</code></pre></div></p>
+<h3 id="oracle-database">Oracle Database<a class="headerlink" href="#oracle-database" title="Permanent link">&para;</a></h3>
+<p><strong>Versions:</strong> 11g, 12c, 18c, 19c, 21c
+<strong>Dialect:</strong> <code>OracleDialect</code></p>
+<p><strong>Features:</strong>
+- ✅ OFFSET/FETCH syntax (12c+)
+- ✅ ROW_NUMBER for older versions
+- ✅ Window functions (8i+)
+- ✅ Common Table Expressions (9i+)
+- ✅ Sequences support
+- ✅ RETURNING clause support</p>
+<p><strong>Example SQL:</strong>
+<div class="highlight"><pre><span></span><code><span class="k">SELECT</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">customers</span>
+<span class="k">OFFSET</span><span class="w"> </span><span class="mi">20</span><span class="w"> </span><span class="k">ROWS</span><span class="w"> </span><span class="k">FETCH</span><span class="w"> </span><span class="k">FIRST</span><span class="w"> </span><span class="mi">10</span><span class="w"> </span><span class="k">ROWS</span><span class="w"> </span><span class="k">ONLY</span>
+</code></pre></div></p>
+<hr />
+<h2 id="database-dialects">Database Dialects<a class="headerlink" href="#database-dialects" title="Permanent link">&para;</a></h2>
+<h3 id="what-is-a-dialect">What is a Dialect?<a class="headerlink" href="#what-is-a-dialect" title="Permanent link">&para;</a></h3>
+<p>A dialect is a class that encapsulates all database-specific behavior. Every model automatically gets the appropriate dialect based on its connection.</p>
+<h3 id="dialect-interface">Dialect Interface<a class="headerlink" href="#dialect-interface" title="Permanent link">&para;</a></h3>
+<p>All dialects implement these methods:</p>
+<div class="highlight"><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">BaseDialect</span><span class="p">:</span>
+    <span class="c1"># Type mapping</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">map_type_to_python</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">db_type</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Type</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">map_python_to_db</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">python_type</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span>
+
+    <span class="c1"># SQL generation</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">limit_offset_clause</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">limit</span><span class="p">,</span> <span class="n">offset</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">concat_function</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">substring_function</span><span class="p">(</span><span class="n">string</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">length</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">current_timestamp</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">str</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">date_add</span><span class="p">(</span><span class="n">date_expr</span><span class="p">,</span> <span class="n">interval</span><span class="p">,</span> <span class="n">unit</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span>
+
+    <span class="c1"># Query optimization</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_optimizer_hints</span><span class="p">(</span><span class="n">query_type</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">optimize_join</span><span class="p">(</span><span class="n">join_type</span><span class="p">,</span> <span class="n">tables</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span>
+
+    <span class="c1"># Information schema</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_table_list_query</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">str</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_table_info_query</span><span class="p">(</span><span class="n">table_name</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span>
+</code></pre></div>
+<h3 id="dialect-properties">Dialect Properties<a class="headerlink" href="#dialect-properties" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><span class="n">dialect</span><span class="o">.</span><span class="n">name</span>                    <span class="c1"># &quot;informix&quot;, &quot;db2&quot;, &quot;oracle&quot;</span>
+<span class="n">dialect</span><span class="o">.</span><span class="n">supports_limit_offset</span>   <span class="c1"># True/False</span>
+<span class="n">dialect</span><span class="o">.</span><span class="n">supports_window_functions</span>  <span class="c1"># True/False</span>
+<span class="n">dialect</span><span class="o">.</span><span class="n">supports_cte</span>            <span class="c1"># True/False</span>
+<span class="n">dialect</span><span class="o">.</span><span class="n">limit_offset_position</span>   <span class="c1"># &quot;start&quot; or &quot;end&quot;</span>
+</code></pre></div>
+<hr />
+<h2 id="automatic-detection">Automatic Detection<a class="headerlink" href="#automatic-detection" title="Permanent link">&para;</a></h2>
+<p>WBORM automatically detects the database type from your connection:</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">wbjdbc</span><span class="w"> </span><span class="kn">import</span> <span class="n">connect_to_db</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">wborm</span><span class="w"> </span><span class="kn">import</span> <span class="n">generate_model</span>
+
+<span class="c1"># Connect to any supported database</span>
+<span class="n">conn</span> <span class="o">=</span> <span class="n">connect_to_db</span><span class="p">(</span>
+    <span class="n">db_type</span><span class="o">=</span><span class="s2">&quot;db2&quot;</span><span class="p">,</span>  <span class="c1"># or &quot;informix&quot;, &quot;oracle&quot;</span>
+    <span class="n">host</span><span class="o">=</span><span class="s2">&quot;localhost&quot;</span><span class="p">,</span>
+    <span class="n">database</span><span class="o">=</span><span class="s2">&quot;mydb&quot;</span><span class="p">,</span>
+    <span class="n">user</span><span class="o">=</span><span class="s2">&quot;myuser&quot;</span><span class="p">,</span>
+    <span class="n">password</span><span class="o">=</span><span class="s2">&quot;mypass&quot;</span>
+<span class="p">)</span>
+
+<span class="c1"># Model automatically uses correct dialect</span>
+<span class="n">Customer</span> <span class="o">=</span> <span class="n">generate_model</span><span class="p">(</span><span class="s2">&quot;customers&quot;</span><span class="p">,</span> <span class="n">conn</span><span class="p">)</span>
+
+<span class="c1"># Queries use DB2 syntax automatically</span>
+<span class="n">customers</span> <span class="o">=</span> <span class="n">Customer</span><span class="o">.</span><span class="n">limit</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+<span class="c1"># Generates: SELECT * FROM customers FETCH FIRST 10 ROWS ONLY</span>
+</code></pre></div>
+<h3 id="manual-dialect-access">Manual Dialect Access<a class="headerlink" href="#manual-dialect-access" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><span class="c1"># Access the dialect</span>
+<span class="n">dialect</span> <span class="o">=</span> <span class="n">Customer</span><span class="o">.</span><span class="n">_dialect</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">dialect</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>  <span class="c1"># &quot;db2&quot;</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">dialect</span><span class="o">.</span><span class="n">supports_window_functions</span><span class="p">)</span>  <span class="c1"># True</span>
+
+<span class="c1"># Use dialect methods directly</span>
+<span class="n">limit_clause</span> <span class="o">=</span> <span class="n">dialect</span><span class="o">.</span><span class="n">limit_offset_clause</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">20</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">limit_clause</span><span class="p">)</span>  <span class="c1"># &quot;OFFSET 20 ROWS FETCH FIRST 10 ROWS ONLY&quot;</span>
+</code></pre></div>
+<hr />
+<h2 id="usage-examples">Usage Examples<a class="headerlink" href="#usage-examples" title="Permanent link">&para;</a></h2>
+<h3 id="example-1-same-code-multiple-databases">Example 1: Same Code, Multiple Databases<a class="headerlink" href="#example-1-same-code-multiple-databases" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><span class="c1"># This code works identically on Informix, DB2, and Oracle</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_active_customers</span><span class="p">(</span><span class="n">conn</span><span class="p">):</span>
+    <span class="n">Customer</span> <span class="o">=</span> <span class="n">generate_model</span><span class="p">(</span><span class="s2">&quot;customers&quot;</span><span class="p">,</span> <span class="n">conn</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="p">(</span>
+        <span class="n">Customer</span>
+        <span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">status</span><span class="o">=</span><span class="s2">&quot;ACTIVE&quot;</span><span class="p">)</span>
+        <span class="o">.</span><span class="n">order_by</span><span class="p">(</span><span class="s2">&quot;name&quot;</span><span class="p">)</span>
+        <span class="o">.</span><span class="n">limit</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span>
+        <span class="o">.</span><span class="n">all</span><span class="p">()</span>
+    <span class="p">)</span>
+
+<span class="c1"># Informix generates: SELECT SKIP 0 FIRST 100 * FROM customers WHERE ...</span>
+<span class="c1"># DB2 generates: SELECT * FROM customers WHERE ... FETCH FIRST 100 ROWS ONLY</span>
+<span class="c1"># Oracle generates: SELECT * FROM customers WHERE ... FETCH FIRST 100 ROWS ONLY</span>
+</code></pre></div>
+<h3 id="example-2-pagination-across-databases">Example 2: Pagination Across Databases<a class="headerlink" href="#example-2-pagination-across-databases" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">paginated_orders</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span> <span class="n">page</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">page_size</span><span class="o">=</span><span class="mi">20</span><span class="p">):</span>
+    <span class="n">Order</span> <span class="o">=</span> <span class="n">generate_model</span><span class="p">(</span><span class="s2">&quot;orders&quot;</span><span class="p">,</span> <span class="n">conn</span><span class="p">)</span>
+
+    <span class="c1"># Works on all databases</span>
+    <span class="n">page_obj</span> <span class="o">=</span> <span class="n">Order</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">status</span><span class="o">=</span><span class="s2">&quot;PENDING&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">paginate</span><span class="p">(</span>
+        <span class="n">page</span><span class="o">=</span><span class="n">page</span><span class="p">,</span>
+        <span class="n">page_size</span><span class="o">=</span><span class="n">page_size</span>
+    <span class="p">)</span>
+
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="s2">&quot;items&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">order</span><span class="o">.</span><span class="n">to_dict</span><span class="p">()</span> <span class="k">for</span> <span class="n">order</span> <span class="ow">in</span> <span class="n">page_obj</span><span class="o">.</span><span class="n">items</span><span class="p">],</span>
+        <span class="s2">&quot;total&quot;</span><span class="p">:</span> <span class="n">page_obj</span><span class="o">.</span><span class="n">total</span><span class="p">,</span>
+        <span class="s2">&quot;pages&quot;</span><span class="p">:</span> <span class="n">page_obj</span><span class="o">.</span><span class="n">pages</span>
+    <span class="p">}</span>
+</code></pre></div>
+<h3 id="example-3-database-specific-features">Example 3: Database-Specific Features<a class="headerlink" href="#example-3-database-specific-features" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">wborm</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_dialect</span><span class="p">,</span> <span class="n">InformixDialect</span><span class="p">,</span> <span class="n">OracleDialect</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">get_current_timestamp</span><span class="p">(</span><span class="n">conn</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Get current timestamp using database-specific syntax&quot;&quot;&quot;</span>
+    <span class="n">dialect</span> <span class="o">=</span> <span class="n">get_dialect</span><span class="p">(</span><span class="n">conn</span><span class="o">.</span><span class="n">db_type</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dialect</span><span class="p">,</span> <span class="n">InformixDialect</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s2">&quot;CURRENT&quot;</span>  <span class="c1"># Informix syntax</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dialect</span><span class="p">,</span> <span class="n">OracleDialect</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s2">&quot;SYSTIMESTAMP&quot;</span>  <span class="c1"># Oracle syntax</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">dialect</span><span class="o">.</span><span class="n">current_timestamp</span><span class="p">()</span>  <span class="c1"># Generic</span>
+</code></pre></div>
+<h3 id="example-4-type-mapping">Example 4: Type Mapping<a class="headerlink" href="#example-4-type-mapping" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">wborm</span><span class="w"> </span><span class="kn">import</span> <span class="n">generate_model</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">introspect_table_types</span><span class="p">(</span><span class="n">table_name</span><span class="p">,</span> <span class="n">conn</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Show how database types map to Python&quot;&quot;&quot;</span>
+    <span class="n">Model</span> <span class="o">=</span> <span class="n">generate_model</span><span class="p">(</span><span class="n">table_name</span><span class="p">,</span> <span class="n">conn</span><span class="p">)</span>
+    <span class="n">dialect</span> <span class="o">=</span> <span class="n">Model</span><span class="o">.</span><span class="n">_dialect</span>
+
+    <span class="c1"># Get table columns from database</span>
+    <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">metadata</span><span class="p">:</span>
+        <span class="n">db_type</span> <span class="o">=</span> <span class="n">col</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">]</span>
+        <span class="n">python_type</span> <span class="o">=</span> <span class="n">dialect</span><span class="o">.</span><span class="n">map_type_to_python</span><span class="p">(</span><span class="n">db_type</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">col</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">db_type</span><span class="si">}</span><span class="s2"> -&gt; </span><span class="si">{</span><span class="n">python_type</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="c1"># Informix: SERIAL -&gt; int, VARCHAR -&gt; str, DATETIME -&gt; str</span>
+<span class="c1"># DB2: INTEGER -&gt; int, VARCHAR -&gt; str, TIMESTAMP -&gt; str</span>
+<span class="c1"># Oracle: NUMBER -&gt; float, VARCHAR2 -&gt; str, DATE -&gt; str</span>
+</code></pre></div>
+<h3 id="example-5-custom-sql-with-dialect-functions">Example 5: Custom SQL with Dialect Functions<a class="headerlink" href="#example-5-custom-sql-with-dialect-functions" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">wborm</span><span class="w"> </span><span class="kn">import</span> <span class="n">generate_model</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">search_customers</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span> <span class="n">search_term</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Search using database-specific string functions&quot;&quot;&quot;</span>
+    <span class="n">Customer</span> <span class="o">=</span> <span class="n">generate_model</span><span class="p">(</span><span class="s2">&quot;customers&quot;</span><span class="p">,</span> <span class="n">conn</span><span class="p">)</span>
+    <span class="n">dialect</span> <span class="o">=</span> <span class="n">Customer</span><span class="o">.</span><span class="n">_dialect</span>
+
+    <span class="c1"># Build database-specific CONCAT</span>
+    <span class="n">full_name</span> <span class="o">=</span> <span class="n">dialect</span><span class="o">.</span><span class="n">concat_function</span><span class="p">(</span><span class="s2">&quot;first_name&quot;</span><span class="p">,</span> <span class="s2">&quot;&#39; &#39;&quot;</span><span class="p">,</span> <span class="s2">&quot;last_name&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Use in raw SQL</span>
+    <span class="n">results</span> <span class="o">=</span> <span class="n">Customer</span><span class="o">.</span><span class="n">raw_sql</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">        SELECT *,</span>
+<span class="s2">               </span><span class="si">{</span><span class="n">full_name</span><span class="si">}</span><span class="s2"> AS full_name,</span>
+<span class="s2">               </span><span class="si">{</span><span class="n">dialect</span><span class="o">.</span><span class="n">substring_function</span><span class="p">(</span><span class="s2">&quot;email&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">50</span><span class="p">)</span><span class="si">}</span><span class="s2"> AS short_email</span>
+<span class="s2">        FROM customers</span>
+<span class="s2">        WHERE </span><span class="si">{</span><span class="n">full_name</span><span class="si">}</span><span class="s2"> LIKE &#39;%</span><span class="si">{</span><span class="n">search_term</span><span class="si">}</span><span class="s2">%&#39;</span>
+<span class="s2">    &quot;&quot;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+
+    <span class="k">return</span> <span class="n">results</span>
+</code></pre></div>
+<hr />
+<h2 id="advanced-features">Advanced Features<a class="headerlink" href="#advanced-features" title="Permanent link">&para;</a></h2>
+<h3 id="optimizer-hints">Optimizer Hints<a class="headerlink" href="#optimizer-hints" title="Permanent link">&para;</a></h3>
+<p>Each dialect provides database-specific optimizer hints:</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">wborm</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_optimizer</span>
+
+<span class="c1"># Register table sizes for JOIN optimization</span>
+<span class="n">optimizer</span> <span class="o">=</span> <span class="n">get_optimizer</span><span class="p">()</span>
+<span class="n">optimizer</span><span class="o">.</span><span class="n">join_optimizer</span><span class="o">.</span><span class="n">register_table_size</span><span class="p">(</span><span class="s2">&quot;customers&quot;</span><span class="p">,</span> <span class="mi">10000</span><span class="p">)</span>
+<span class="n">optimizer</span><span class="o">.</span><span class="n">join_optimizer</span><span class="o">.</span><span class="n">register_table_size</span><span class="p">(</span><span class="s2">&quot;orders&quot;</span><span class="p">,</span> <span class="mi">1000000</span><span class="p">)</span>
+
+<span class="c1"># Get JOIN optimization suggestions</span>
+<span class="n">tables</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;customers&quot;</span><span class="p">,</span> <span class="s2">&quot;orders&quot;</span><span class="p">,</span> <span class="s2">&quot;items&quot;</span><span class="p">]</span>
+<span class="n">suggested_order</span> <span class="o">=</span> <span class="n">optimizer</span><span class="o">.</span><span class="n">join_optimizer</span><span class="o">.</span><span class="n">suggest_join_order</span><span class="p">(</span><span class="n">tables</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">suggested_order</span><span class="p">)</span>  <span class="c1"># [&#39;customers&#39;, &#39;orders&#39;, &#39;items&#39;] (smallest first)</span>
+
+<span class="c1"># Get database-specific hints</span>
+<span class="n">dialect</span> <span class="o">=</span> <span class="n">Customer</span><span class="o">.</span><span class="n">_dialect</span>
+<span class="n">hint</span> <span class="o">=</span> <span class="n">dialect</span><span class="o">.</span><span class="n">get_optimizer_hints</span><span class="p">(</span><span class="s2">&quot;SELECT&quot;</span><span class="p">)</span>
+<span class="c1"># Informix: &quot;&quot;</span>
+<span class="c1"># Oracle: &quot;/*+ FIRST_ROWS */&quot;</span>
+<span class="c1"># DB2: &quot;&quot;</span>
+</code></pre></div>
+<h3 id="information-schema-queries">Information Schema Queries<a class="headerlink" href="#information-schema-queries" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">list_all_tables</span><span class="p">(</span><span class="n">conn</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;List tables using database-specific system catalogs&quot;&quot;&quot;</span>
+    <span class="n">dialect</span> <span class="o">=</span> <span class="n">detect_dialect</span><span class="p">(</span><span class="n">conn</span><span class="p">)</span>
+
+    <span class="n">query</span> <span class="o">=</span> <span class="n">dialect</span><span class="o">.</span><span class="n">get_table_list_query</span><span class="p">()</span>
+    <span class="c1"># Informix: SELECT tabname FROM systables WHERE ...</span>
+    <span class="c1"># DB2: SELECT tabname FROM syscat.tables WHERE ...</span>
+    <span class="c1"># Oracle: SELECT table_name FROM user_tables ...</span>
+
+    <span class="n">results</span> <span class="o">=</span> <span class="n">conn</span><span class="o">.</span><span class="n">execute_query</span><span class="p">(</span><span class="n">query</span><span class="p">)</span>
+    <span class="k">return</span> <span class="p">[</span><span class="n">row</span><span class="p">[</span><span class="s2">&quot;table_name&quot;</span><span class="p">]</span> <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">results</span><span class="p">]</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">get_table_structure</span><span class="p">(</span><span class="n">table_name</span><span class="p">,</span> <span class="n">conn</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Get table columns using database-specific catalogs&quot;&quot;&quot;</span>
+    <span class="n">dialect</span> <span class="o">=</span> <span class="n">detect_dialect</span><span class="p">(</span><span class="n">conn</span><span class="p">)</span>
+
+    <span class="n">query</span> <span class="o">=</span> <span class="n">dialect</span><span class="o">.</span><span class="n">get_table_info_query</span><span class="p">(</span><span class="n">table_name</span><span class="p">)</span>
+    <span class="c1"># Returns column_name, data_type, is_nullable for all databases</span>
+
+    <span class="k">return</span> <span class="n">conn</span><span class="o">.</span><span class="n">execute_query</span><span class="p">(</span><span class="n">query</span><span class="p">)</span>
+</code></pre></div>
+<h3 id="window-functions-with-dialects">Window Functions with Dialects<a class="headerlink" href="#window-functions-with-dialects" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">wborm</span><span class="w"> </span><span class="kn">import</span> <span class="n">Window</span><span class="p">,</span> <span class="n">ROW_NUMBER</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">get_top_customers_per_region</span><span class="p">(</span><span class="n">conn</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Use window functions (works on all databases)&quot;&quot;&quot;</span>
+
+    <span class="n">Customer</span> <span class="o">=</span> <span class="n">generate_model</span><span class="p">(</span><span class="s2">&quot;customers&quot;</span><span class="p">,</span> <span class="n">conn</span><span class="p">)</span>
+
+    <span class="c1"># Check if database supports window functions</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">Customer</span><span class="o">.</span><span class="n">_dialect</span><span class="o">.</span><span class="n">supports_window_functions</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Warning: Window functions not supported&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="kc">None</span>
+
+    <span class="c1"># Build window function query</span>
+    <span class="n">row_num</span> <span class="o">=</span> <span class="n">ROW_NUMBER</span><span class="p">()</span><span class="o">.</span><span class="n">over</span><span class="p">(</span>
+        <span class="n">partition_by</span><span class="o">=</span><span class="s2">&quot;region&quot;</span><span class="p">,</span>
+        <span class="n">order_by</span><span class="o">=</span><span class="s2">&quot;total_sales DESC&quot;</span>
+    <span class="p">)</span>
+
+    <span class="n">sql</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">        SELECT * FROM (</span>
+<span class="s2">            SELECT *, </span><span class="si">{</span><span class="n">row_num</span><span class="si">}</span><span class="s2"> AS rn</span>
+<span class="s2">            FROM customers</span>
+<span class="s2">        ) WHERE rn &lt;= 5</span>
+<span class="s2">    &quot;&quot;&quot;</span>
+
+    <span class="k">return</span> <span class="n">Customer</span><span class="o">.</span><span class="n">raw_sql</span><span class="p">(</span><span class="n">sql</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+</code></pre></div>
+<hr />
+<h2 id="custom-dialects">Custom Dialects<a class="headerlink" href="#custom-dialects" title="Permanent link">&para;</a></h2>
+<p>You can create custom dialects for other databases:</p>
+<h3 id="step-1-create-dialect-class">Step 1: Create Dialect Class<a class="headerlink" href="#step-1-create-dialect-class" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">wborm.dialects</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseDialect</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Type</span><span class="p">,</span> <span class="n">Union</span><span class="p">,</span> <span class="n">Optional</span>
+
+<span class="k">class</span><span class="w"> </span><span class="nc">PostgreSQLDialect</span><span class="p">(</span><span class="n">BaseDialect</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;PostgreSQL dialect&quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;postgresql&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">supports_limit_offset</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">supports_window_functions</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">supports_cte</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">limit_offset_position</span> <span class="o">=</span> <span class="s2">&quot;end&quot;</span>  <span class="c1"># LIMIT goes at end</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">map_type_to_python</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">db_type</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Type</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Map PostgreSQL types to Python&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">db_type</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">type_str</span> <span class="o">=</span> <span class="n">db_type</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>
+
+            <span class="k">if</span> <span class="n">type_str</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;SMALLINT&quot;</span><span class="p">,</span> <span class="s2">&quot;INTEGER&quot;</span><span class="p">,</span> <span class="s2">&quot;BIGINT&quot;</span><span class="p">):</span>
+                <span class="k">return</span> <span class="nb">int</span>
+            <span class="k">elif</span> <span class="n">type_str</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;NUMERIC&quot;</span><span class="p">,</span> <span class="s2">&quot;DECIMAL&quot;</span><span class="p">,</span> <span class="s2">&quot;REAL&quot;</span><span class="p">,</span> <span class="s2">&quot;DOUBLE PRECISION&quot;</span><span class="p">):</span>
+                <span class="k">return</span> <span class="nb">float</span>
+            <span class="k">elif</span> <span class="n">type_str</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;VARCHAR&quot;</span><span class="p">,</span> <span class="s2">&quot;TEXT&quot;</span><span class="p">,</span> <span class="s2">&quot;CHAR&quot;</span><span class="p">):</span>
+                <span class="k">return</span> <span class="nb">str</span>
+            <span class="k">elif</span> <span class="n">type_str</span> <span class="o">==</span> <span class="s2">&quot;BOOLEAN&quot;</span><span class="p">:</span>
+                <span class="k">return</span> <span class="nb">bool</span>
+            <span class="k">elif</span> <span class="n">type_str</span> <span class="o">==</span> <span class="s2">&quot;BYTEA&quot;</span><span class="p">:</span>
+                <span class="k">return</span> <span class="nb">bytes</span>
+
+        <span class="k">return</span> <span class="nb">str</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">limit_offset_clause</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">limit</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span> <span class="n">offset</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Generate PostgreSQL LIMIT/OFFSET&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">limit</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s2">&quot;&quot;</span>
+
+        <span class="n">clause</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;LIMIT </span><span class="si">{</span><span class="n">limit</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="k">if</span> <span class="n">offset</span><span class="p">:</span>
+            <span class="n">clause</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot; OFFSET </span><span class="si">{</span><span class="n">offset</span><span class="si">}</span><span class="s2">&quot;</span>
+
+        <span class="k">return</span> <span class="n">clause</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">current_timestamp</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;PostgreSQL current timestamp&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="s2">&quot;CURRENT_TIMESTAMP&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">concat_function</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;PostgreSQL concatenation (uses ||)&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="s2">&quot; || &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>
+</code></pre></div>
+<h3 id="step-2-register-custom-dialect">Step 2: Register Custom Dialect<a class="headerlink" href="#step-2-register-custom-dialect" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">wborm</span><span class="w"> </span><span class="kn">import</span> <span class="n">register_dialect</span>
+
+<span class="c1"># Register your custom dialect</span>
+<span class="n">register_dialect</span><span class="p">(</span><span class="s2">&quot;postgresql&quot;</span><span class="p">,</span> <span class="n">PostgreSQLDialect</span><span class="p">)</span>
+
+<span class="c1"># Now you can use it</span>
+<span class="n">dialect</span> <span class="o">=</span> <span class="n">get_dialect</span><span class="p">(</span><span class="s2">&quot;postgresql&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">dialect</span><span class="o">.</span><span class="n">limit_offset_clause</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">20</span><span class="p">))</span>  <span class="c1"># &quot;LIMIT 10 OFFSET 20&quot;</span>
+</code></pre></div>
+<h3 id="step-3-use-with-connection">Step 3: Use with Connection<a class="headerlink" href="#step-3-use-with-connection" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><span class="c1"># If your connection has db_type attribute</span>
+<span class="n">conn</span><span class="o">.</span><span class="n">db_type</span> <span class="o">=</span> <span class="s2">&quot;postgresql&quot;</span>
+
+<span class="c1"># Models will automatically use PostgreSQL dialect</span>
+<span class="n">Customer</span> <span class="o">=</span> <span class="n">generate_model</span><span class="p">(</span><span class="s2">&quot;customers&quot;</span><span class="p">,</span> <span class="n">conn</span><span class="p">)</span>
+<span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">Customer</span><span class="o">.</span><span class="n">_dialect</span><span class="p">,</span> <span class="n">PostgreSQLDialect</span><span class="p">)</span>
+</code></pre></div>
+<hr />
+<h2 id="best-practices">Best Practices<a class="headerlink" href="#best-practices" title="Permanent link">&para;</a></h2>
+<h3 id="1-let-wborm-handle-dialect-selection">1. Let WBORM Handle Dialect Selection<a class="headerlink" href="#1-let-wborm-handle-dialect-selection" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><span class="c1"># ✅ Good: Automatic detection</span>
+<span class="n">Customer</span> <span class="o">=</span> <span class="n">generate_model</span><span class="p">(</span><span class="s2">&quot;customers&quot;</span><span class="p">,</span> <span class="n">conn</span><span class="p">)</span>
+<span class="n">customers</span> <span class="o">=</span> <span class="n">Customer</span><span class="o">.</span><span class="n">limit</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+
+<span class="c1"># ❌ Avoid: Hardcoding database-specific SQL</span>
+<span class="n">Customer</span><span class="o">.</span><span class="n">raw_sql</span><span class="p">(</span><span class="s2">&quot;SELECT SKIP 0 FIRST 100 * FROM customers&quot;</span><span class="p">)</span>
+</code></pre></div>
+<h3 id="2-check-feature-support">2. Check Feature Support<a class="headerlink" href="#2-check-feature-support" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><span class="c1"># ✅ Good: Check before using advanced features</span>
+<span class="k">if</span> <span class="n">Customer</span><span class="o">.</span><span class="n">_dialect</span><span class="o">.</span><span class="n">supports_window_functions</span><span class="p">:</span>
+    <span class="c1"># Use window functions</span>
+    <span class="k">pass</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="c1"># Fallback to alternative approach</span>
+    <span class="k">pass</span>
+
+<span class="c1"># ❌ Avoid: Assuming features are available</span>
+<span class="n">result</span> <span class="o">=</span> <span class="n">Customer</span><span class="o">.</span><span class="n">raw_sql</span><span class="p">(</span><span class="s2">&quot;SELECT ROW_NUMBER() OVER ...&quot;</span><span class="p">)</span>  <span class="c1"># May fail</span>
+</code></pre></div>
+<h3 id="3-use-dialect-methods-for-custom-sql">3. Use Dialect Methods for Custom SQL<a class="headerlink" href="#3-use-dialect-methods-for-custom-sql" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><span class="n">dialect</span> <span class="o">=</span> <span class="n">Customer</span><span class="o">.</span><span class="n">_dialect</span>
+
+<span class="c1"># ✅ Good: Use dialect methods</span>
+<span class="n">concat</span> <span class="o">=</span> <span class="n">dialect</span><span class="o">.</span><span class="n">concat_function</span><span class="p">(</span><span class="s2">&quot;first_name&quot;</span><span class="p">,</span> <span class="s2">&quot;last_name&quot;</span><span class="p">)</span>
+<span class="n">timestamp</span> <span class="o">=</span> <span class="n">dialect</span><span class="o">.</span><span class="n">current_timestamp</span><span class="p">()</span>
+
+<span class="c1"># ❌ Avoid: Hardcoding SQL functions</span>
+<span class="n">concat</span> <span class="o">=</span> <span class="s2">&quot;first_name || last_name&quot;</span>  <span class="c1"># May not work on all databases</span>
+</code></pre></div>
+<h3 id="4-register-table-statistics">4. Register Table Statistics<a class="headerlink" href="#4-register-table-statistics" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">wborm</span><span class="w"> </span><span class="kn">import</span> <span class="n">register_table_stats</span>
+
+<span class="c1"># ✅ Good: Help optimizer make better decisions</span>
+<span class="n">register_table_stats</span><span class="p">(</span><span class="s2">&quot;customers&quot;</span><span class="p">,</span> <span class="mi">10000</span><span class="p">)</span>
+<span class="n">register_table_stats</span><span class="p">(</span><span class="s2">&quot;orders&quot;</span><span class="p">,</span> <span class="mi">1000000</span><span class="p">)</span>
+
+<span class="c1"># Now queries will use this information for JOINs</span>
+</code></pre></div>
+<hr />
+<h2 id="migration-guide">Migration Guide<a class="headerlink" href="#migration-guide" title="Permanent link">&para;</a></h2>
+<h3 id="moving-from-informix-only-to-multi-database">Moving from Informix-Only to Multi-Database<a class="headerlink" href="#moving-from-informix-only-to-multi-database" title="Permanent link">&para;</a></h3>
+<p>If you have existing WBORM code for Informix:</p>
+<p><strong>No changes needed!</strong> Your code will continue to work:</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># This code works on Informix AND now also on DB2/Oracle</span>
+<span class="n">Customer</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">status</span><span class="o">=</span><span class="s2">&quot;ACTIVE&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">limit</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+</code></pre></div>
+<p><strong>Optional improvements:</strong></p>
+<ol>
+<li>
+<p><strong>Remove Informix-specific SQL:</strong>
+   <div class="highlight"><pre><span></span><code><span class="c1"># Before (Informix-specific)</span>
+<span class="n">Customer</span><span class="o">.</span><span class="n">raw_sql</span><span class="p">(</span><span class="s2">&quot;SELECT SKIP 20 FIRST 10 * FROM customers&quot;</span><span class="p">)</span>
+
+<span class="c1"># After (database-agnostic)</span>
+<span class="n">Customer</span><span class="o">.</span><span class="n">offset</span><span class="p">(</span><span class="mi">20</span><span class="p">)</span><span class="o">.</span><span class="n">limit</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+</code></pre></div></p>
+</li>
+<li>
+<p><strong>Check dialect when using raw SQL:</strong>
+   <div class="highlight"><pre><span></span><code><span class="n">dialect</span> <span class="o">=</span> <span class="n">Customer</span><span class="o">.</span><span class="n">_dialect</span>
+<span class="k">if</span> <span class="n">dialect</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s2">&quot;informix&quot;</span><span class="p">:</span>
+    <span class="c1"># Informix-specific query</span>
+<span class="k">elif</span> <span class="n">dialect</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s2">&quot;oracle&quot;</span><span class="p">:</span>
+    <span class="c1"># Oracle-specific query</span>
+</code></pre></div></p>
+</li>
+</ol>
+<hr />
+<h2 id="troubleshooting">Troubleshooting<a class="headerlink" href="#troubleshooting" title="Permanent link">&para;</a></h2>
+<h3 id="dialect-not-detected">Dialect Not Detected<a class="headerlink" href="#dialect-not-detected" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><span class="c1"># Check connection db_type</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">conn</span><span class="o">.</span><span class="n">db_type</span><span class="p">)</span>  <span class="c1"># Should be &quot;informix&quot;, &quot;db2&quot;, or &quot;oracle&quot;</span>
+
+<span class="c1"># Manually detect</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">wborm.dialects</span><span class="w"> </span><span class="kn">import</span> <span class="n">detect_dialect</span>
+<span class="n">dialect</span> <span class="o">=</span> <span class="n">detect_dialect</span><span class="p">(</span><span class="n">conn</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">dialect</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+</code></pre></div>
+<h3 id="wrong-sql-generated">Wrong SQL Generated<a class="headerlink" href="#wrong-sql-generated" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><span class="c1"># Verify dialect</span>
+<span class="n">Customer</span> <span class="o">=</span> <span class="n">generate_model</span><span class="p">(</span><span class="s2">&quot;customers&quot;</span><span class="p">,</span> <span class="n">conn</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Using dialect: </span><span class="si">{</span><span class="n">Customer</span><span class="o">.</span><span class="n">_dialect</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Position: </span><span class="si">{</span><span class="n">Customer</span><span class="o">.</span><span class="n">_dialect</span><span class="o">.</span><span class="n">limit_offset_position</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="c1"># Test limit clause</span>
+<span class="n">clause</span> <span class="o">=</span> <span class="n">Customer</span><span class="o">.</span><span class="n">_dialect</span><span class="o">.</span><span class="n">limit_offset_clause</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">20</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Limit clause: </span><span class="si">{</span><span class="n">clause</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</code></pre></div>
+<h3 id="feature-not-supported">Feature Not Supported<a class="headerlink" href="#feature-not-supported" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><span class="c1"># Check feature support</span>
+<span class="n">dialect</span> <span class="o">=</span> <span class="n">Customer</span><span class="o">.</span><span class="n">_dialect</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Window functions: </span><span class="si">{</span><span class="n">dialect</span><span class="o">.</span><span class="n">supports_window_functions</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;CTEs: </span><span class="si">{</span><span class="n">dialect</span><span class="o">.</span><span class="n">supports_cte</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Limit/Offset: </span><span class="si">{</span><span class="n">dialect</span><span class="o">.</span><span class="n">supports_limit_offset</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="c1"># Fallback if needed</span>
+<span class="k">if</span> <span class="ow">not</span> <span class="n">dialect</span><span class="o">.</span><span class="n">supports_window_functions</span><span class="p">:</span>
+    <span class="c1"># Use alternative approach without window functions</span>
+    <span class="k">pass</span>
+</code></pre></div>
+<hr />
+<h2 id="technical-details">Technical Details<a class="headerlink" href="#technical-details" title="Permanent link">&para;</a></h2>
+<h3 id="limitoffset-positioning">Limit/Offset Positioning<a class="headerlink" href="#limitoffset-positioning" title="Permanent link">&para;</a></h3>
+<p>Different databases place LIMIT/OFFSET clauses in different positions:</p>
+<p><strong>Start (after SELECT):</strong>
+- Informix: <code>SELECT SKIP 20 FIRST 10 * FROM ...</code></p>
+<p><strong>End (after ORDER BY):</strong>
+- DB2: <code>SELECT * FROM ... ORDER BY ... OFFSET 20 ROWS FETCH FIRST 10 ROWS ONLY</code>
+- Oracle: <code>SELECT * FROM ... ORDER BY ... OFFSET 20 ROWS FETCH FIRST 10 ROWS ONLY</code></p>
+<p>WBORM handles this automatically using <code>limit_offset_position</code> property.</p>
+<h3 id="type-mapping">Type Mapping<a class="headerlink" href="#type-mapping" title="Permanent link">&para;</a></h3>
+<p>Each dialect maps database types to Python types:</p>
+<table>
+<thead>
+<tr>
+<th>Python Type</th>
+<th>Informix</th>
+<th>DB2</th>
+<th>Oracle</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>int</code></td>
+<td>SERIAL, INTEGER, SMALLINT</td>
+<td>INTEGER, SMALLINT, BIGINT</td>
+<td>NUMBER, INTEGER</td>
+</tr>
+<tr>
+<td><code>float</code></td>
+<td>FLOAT, DECIMAL</td>
+<td>DECIMAL, FLOAT, DOUBLE</td>
+<td>NUMBER, FLOAT, BINARY_DOUBLE</td>
+</tr>
+<tr>
+<td><code>str</code></td>
+<td>VARCHAR, CHAR, TEXT</td>
+<td>VARCHAR, CHAR, CLOB</td>
+<td>VARCHAR2, CHAR, CLOB</td>
+</tr>
+<tr>
+<td><code>bytes</code></td>
+<td>BYTE, BLOB</td>
+<td>BLOB, BINARY</td>
+<td>BLOB, RAW</td>
+</tr>
+<tr>
+<td><code>bool</code></td>
+<td>BOOLEAN, CHAR(1)</td>
+<td>BOOLEAN</td>
+<td>NUMBER(1)</td>
+</tr>
+</tbody>
+</table>
+<h3 id="query-building-process">Query Building Process<a class="headerlink" href="#query-building-process" title="Permanent link">&para;</a></h3>
+<ol>
+<li>Model is created with <code>generate_model()</code></li>
+<li>Connection dialect is detected with <code>detect_dialect()</code></li>
+<li>Dialect is attached to model as <code>Model._dialect</code></li>
+<li>QuerySet uses <code>Model._dialect.limit_offset_clause()</code> for pagination</li>
+<li>SQL is built with dialect-specific syntax</li>
+</ol>
+<hr />
+<h2 id="summary">Summary<a class="headerlink" href="#summary" title="Permanent link">&para;</a></h2>
+<p><strong>Multi-Database Support Achievements:</strong></p>
+<p>✅ <strong>Multi-Database Support</strong>: Informix, DB2, Oracle
+✅ <strong>Automatic Dialect Detection</strong>: Zero configuration
+✅ <strong>Backward Compatible</strong>: Existing code works unchanged
+✅ <strong>Type Mapping</strong>: Database-specific type conversion
+✅ <strong>Query Optimization</strong>: Database-specific hints
+✅ <strong>Extensible</strong>: Custom dialects supported</p>
+<p><strong>Next Steps:</strong></p>
+<ul>
+<li>Test with real DB2 and Oracle connections</li>
+<li>Add more database-specific optimizations</li>
+<li>Consider adding MySQL, PostgreSQL, SQL Server support</li>
+</ul>
+<hr />
+<p><strong>For more examples and use cases, see:</strong>
+- Performance Examples: <code>docs/performance_examples.md</code>
+- Query Optimization: <code>wborm/query_optimizer.py</code>
+- Dialect Source Code: <code>wborm/dialects/</code></p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+        
+<div class="md-social">
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://github.com/wanderbatistaf" target="_blank" rel="noopener" title="github.com" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.tabs", "navigation.sections", "navigation.indexes", "toc.integrate", "content.code.annotate", "search.suggest", "search.highlight"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copiado para \u00e1rea de transfer\u00eancia", "clipboard.copy": "Copiar para \u00e1rea de transfer\u00eancia", "search.result.more.one": "Mais 1 nesta p\u00e1gina", "search.result.more.other": "Mais # nesta p\u00e1gina", "search.result.none": "Nenhum resultado encontrado", "search.result.one": "1 resultado encontrado", "search.result.other": "# resultados encontrados", "search.result.placeholder": "Digite para iniciar a busca", "search.result.term.missing": "Ausente", "select.version": "Selecione a vers\u00e3o"}, "version": null}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>

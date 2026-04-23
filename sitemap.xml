@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
+    <url>
+        <loc>https://wanderbatistaf.github.io/wborm/</loc>
+        <lastmod>2026-04-23</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://wanderbatistaf.github.io/wborm/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://wanderbatistaf.github.io/wborm/en/"/>
+    </url>
+    <url>
+        <loc>https://wanderbatistaf.github.io/wborm/cache_configuration/</loc>
+        <lastmod>2026-04-23</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://wanderbatistaf.github.io/wborm/cache_configuration/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://wanderbatistaf.github.io/wborm/en/cache_configuration/"/>
+    </url>
+    <url>
+        <loc>https://wanderbatistaf.github.io/wborm/changelog/</loc>
+        <lastmod>2026-04-23</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://wanderbatistaf.github.io/wborm/changelog/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://wanderbatistaf.github.io/wborm/en/changelog/"/>
+    </url>
+    <url>
+        <loc>https://wanderbatistaf.github.io/wborm/exemplos/</loc>
+        <lastmod>2026-04-23</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://wanderbatistaf.github.io/wborm/exemplos/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://wanderbatistaf.github.io/wborm/en/exemplos/"/>
+    </url>
+    <url>
+        <loc>https://wanderbatistaf.github.io/wborm/fastapi_production_guide/</loc>
+        <lastmod>2026-04-23</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://wanderbatistaf.github.io/wborm/fastapi_production_guide/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://wanderbatistaf.github.io/wborm/en/fastapi_production_guide/"/>
+    </url>
+    <url>
+        <loc>https://wanderbatistaf.github.io/wborm/global_connection_guide/</loc>
+        <lastmod>2026-04-23</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://wanderbatistaf.github.io/wborm/global_connection_guide/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://wanderbatistaf.github.io/wborm/en/global_connection_guide/"/>
+    </url>
+    <url>
+        <loc>https://wanderbatistaf.github.io/wborm/informix_integration/</loc>
+        <lastmod>2026-04-23</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://wanderbatistaf.github.io/wborm/informix_integration/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://wanderbatistaf.github.io/wborm/en/informix_integration/"/>
+    </url>
+    <url>
+        <loc>https://wanderbatistaf.github.io/wborm/integra-wbjdbc/</loc>
+        <lastmod>2026-04-23</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://wanderbatistaf.github.io/wborm/integra-wbjdbc/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://wanderbatistaf.github.io/wborm/en/integra-wbjdbc/"/>
+    </url>
+    <url>
+        <loc>https://wanderbatistaf.github.io/wborm/modelos/</loc>
+        <lastmod>2026-04-23</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://wanderbatistaf.github.io/wborm/modelos/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://wanderbatistaf.github.io/wborm/en/modelos/"/>
+    </url>
+    <url>
+        <loc>https://wanderbatistaf.github.io/wborm/multi_database_support/</loc>
+        <lastmod>2026-04-23</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://wanderbatistaf.github.io/wborm/multi_database_support/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://wanderbatistaf.github.io/wborm/en/multi_database_support/"/>
+    </url>
+    <url>
+        <loc>https://wanderbatistaf.github.io/wborm/performance_examples/</loc>
+        <lastmod>2026-04-23</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://wanderbatistaf.github.io/wborm/performance_examples/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://wanderbatistaf.github.io/wborm/en/performance_examples/"/>
+    </url>
+    <url>
+        <loc>https://wanderbatistaf.github.io/wborm/performance_features_examples/</loc>
+        <lastmod>2026-04-23</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://wanderbatistaf.github.io/wborm/performance_features_examples/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://wanderbatistaf.github.io/wborm/en/performance_features_examples/"/>
+    </url>
+    <url>
+        <loc>https://wanderbatistaf.github.io/wborm/por-que-usar/</loc>
+        <lastmod>2026-04-23</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://wanderbatistaf.github.io/wborm/por-que-usar/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://wanderbatistaf.github.io/wborm/en/por-que-usar/"/>
+    </url>
+    <url>
+        <loc>https://wanderbatistaf.github.io/wborm/testing/</loc>
+        <lastmod>2026-04-23</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://wanderbatistaf.github.io/wborm/testing/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://wanderbatistaf.github.io/wborm/en/testing/"/>
+    </url>
+    <url>
+        <loc>https://wanderbatistaf.github.io/wborm/en/</loc>
+        <lastmod>2026-04-23</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://wanderbatistaf.github.io/wborm/en/"/>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://wanderbatistaf.github.io/wborm/"/>
+    </url>
+    <url>
+        <loc>https://wanderbatistaf.github.io/wborm/en/cache_configuration/</loc>
+        <lastmod>2026-04-23</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://wanderbatistaf.github.io/wborm/en/cache_configuration/"/>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://wanderbatistaf.github.io/wborm/cache_configuration/"/>
+    </url>
+    <url>
+        <loc>https://wanderbatistaf.github.io/wborm/en/changelog/</loc>
+        <lastmod>2026-04-23</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://wanderbatistaf.github.io/wborm/en/changelog/"/>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://wanderbatistaf.github.io/wborm/changelog/"/>
+    </url>
+    <url>
+        <loc>https://wanderbatistaf.github.io/wborm/en/exemplos/</loc>
+        <lastmod>2026-04-23</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://wanderbatistaf.github.io/wborm/en/exemplos/"/>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://wanderbatistaf.github.io/wborm/exemplos/"/>
+    </url>
+    <url>
+        <loc>https://wanderbatistaf.github.io/wborm/en/fastapi_production_guide/</loc>
+        <lastmod>2026-04-23</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://wanderbatistaf.github.io/wborm/en/fastapi_production_guide/"/>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://wanderbatistaf.github.io/wborm/fastapi_production_guide/"/>
+    </url>
+    <url>
+        <loc>https://wanderbatistaf.github.io/wborm/en/global_connection_guide/</loc>
+        <lastmod>2026-04-23</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://wanderbatistaf.github.io/wborm/en/global_connection_guide/"/>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://wanderbatistaf.github.io/wborm/global_connection_guide/"/>
+    </url>
+    <url>
+        <loc>https://wanderbatistaf.github.io/wborm/en/informix_integration/</loc>
+        <lastmod>2026-04-23</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://wanderbatistaf.github.io/wborm/en/informix_integration/"/>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://wanderbatistaf.github.io/wborm/informix_integration/"/>
+    </url>
+    <url>
+        <loc>https://wanderbatistaf.github.io/wborm/en/integra-wbjdbc/</loc>
+        <lastmod>2026-04-23</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://wanderbatistaf.github.io/wborm/en/integra-wbjdbc/"/>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://wanderbatistaf.github.io/wborm/integra-wbjdbc/"/>
+    </url>
+    <url>
+        <loc>https://wanderbatistaf.github.io/wborm/en/modelos/</loc>
+        <lastmod>2026-04-23</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://wanderbatistaf.github.io/wborm/en/modelos/"/>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://wanderbatistaf.github.io/wborm/modelos/"/>
+    </url>
+    <url>
+        <loc>https://wanderbatistaf.github.io/wborm/en/multi_database_support/</loc>
+        <lastmod>2026-04-23</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://wanderbatistaf.github.io/wborm/en/multi_database_support/"/>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://wanderbatistaf.github.io/wborm/multi_database_support/"/>
+    </url>
+    <url>
+        <loc>https://wanderbatistaf.github.io/wborm/en/performance_examples/</loc>
+        <lastmod>2026-04-23</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://wanderbatistaf.github.io/wborm/en/performance_examples/"/>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://wanderbatistaf.github.io/wborm/performance_examples/"/>
+    </url>
+    <url>
+        <loc>https://wanderbatistaf.github.io/wborm/en/performance_features_examples/</loc>
+        <lastmod>2026-04-23</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://wanderbatistaf.github.io/wborm/en/performance_features_examples/"/>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://wanderbatistaf.github.io/wborm/performance_features_examples/"/>
+    </url>
+    <url>
+        <loc>https://wanderbatistaf.github.io/wborm/en/por-que-usar/</loc>
+        <lastmod>2026-04-23</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://wanderbatistaf.github.io/wborm/en/por-que-usar/"/>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://wanderbatistaf.github.io/wborm/por-que-usar/"/>
+    </url>
+    <url>
+        <loc>https://wanderbatistaf.github.io/wborm/en/testing/</loc>
+        <lastmod>2026-04-23</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://wanderbatistaf.github.io/wborm/en/testing/"/>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://wanderbatistaf.github.io/wborm/testing/"/>
+    </url>
+</urlset>
